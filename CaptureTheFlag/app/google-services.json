@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1031062507276",
+    "project_id": "capturetheflag-56f1c",
+    "storage_bucket": "capturetheflag-56f1c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031062507276:android:5e05c66e5e88a0769b8329",
+        "android_client_info": {
+          "package_name": "elfak.mosis.capturetheflag"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1031062507276-hpmi9bt1nl5hgempam1gchm9jj8mtep9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAovJHY6oiYYLWBPltGRHyWEBwdK7uW3zs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031062507276-hpmi9bt1nl5hgempam1gchm9jj8mtep9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
