@@ -49,22 +49,7 @@ class SecondFragment : Fragment() {
 
         val buttonSignup : Button = requireView().findViewById<Button>(R.id.buttonSignup)
         buttonSignup.isEnabled = false
-
-        inputUsername.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-        })
+        
         inputUsername.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 buttonSignup.isEnabled = (inputUsername.text.length > 0)
