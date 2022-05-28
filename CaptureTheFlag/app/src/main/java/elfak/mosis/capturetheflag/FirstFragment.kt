@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputLayout
 import elfak.mosis.capturetheflag.databinding.FragmentFirstBinding
 
 /**
@@ -31,8 +33,11 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val username: TextInputLayout = requireView().findViewById<TextInputLayout>(R.id.textInputUsername)
+        val password: TextInputLayout = requireView().findViewById<TextInputLayout>(R.id.textInputPassword)
 
-        binding.buttonFirst.setOnClickListener {
+
+        binding.createAccButton.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
     }
