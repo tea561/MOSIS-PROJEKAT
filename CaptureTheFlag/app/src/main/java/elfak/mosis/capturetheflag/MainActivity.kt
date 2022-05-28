@@ -32,6 +32,13 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            if (destination.id == R.id.SecondFragment)
+                binding.fab.hide()
+            else
+                binding.fab.show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
