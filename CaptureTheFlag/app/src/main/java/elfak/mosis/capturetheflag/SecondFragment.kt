@@ -146,7 +146,7 @@ class SecondFragment : Fragment() {
             }
         })
 
-        buttonSignup.setOnClickListener{
+        binding.buttonSignup.setOnClickListener{
             val username: String = inputUsername.text.toString()
             val password: String = inputPassword.text.toString()
             val firstName: String = inputFirstName.text.toString()
@@ -167,6 +167,7 @@ class SecondFragment : Fragment() {
                         dbRef.child("users").child(phoneNum).child("password").setValue(password)
 
                         Toast.makeText(view.context, "User registered successfully", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.action_SecondFragment_to_Intro1Fragment)
                     }
                 }
 

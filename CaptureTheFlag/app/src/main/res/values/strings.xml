@@ -4,6 +4,8 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+    <string name="intro1_fragment_label">Intro1 Fragment</string>
+    <string name="intro2_fragment_label">Intro2 Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -14,4 +16,13 @@
     <string name="login_button">Log In</string>
     <string name="create_acc_button">Create now</string>
     <string name="no_acc_label">Don\'t have account?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome">Welcome To Capture The Flag</string>
+    <string name="welcome_desc">Bla bla bla dobrodosli da</string>
+    <string name="skip">Skip</string>
+    <string name="intro2">First, set your profile picture</string>
+    <string name="intro2_desc">It will be easier for your friends to find you.</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="intro3">Tell us about yourself!</string>
 </resources>

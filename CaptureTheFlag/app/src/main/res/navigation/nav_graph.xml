@@ -24,5 +24,26 @@
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_Intro1Fragment"
+            app:destination="@id/Intro1Fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/Intro1Fragment"
+        android:name="elfak.mosis.capturetheflag.Intro1Fragment"
+        android:label="@string/intro1_fragment_label"
+        tools:layout="@layout/fragment_intro1">
+
+        <action
+            android:id="@+id/action_Intro1Fragment_to_Intro2Fragment"
+            app:destination="@id/Intro2Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/Intro2Fragment"
+        android:name="elfak.mosis.capturetheflag.Intro2Fragment"
+        android:label="@string/intro2_fragment_label"
+        tools:layout="@layout/fragment_intro2">
+
     </fragment>
 </navigation>
