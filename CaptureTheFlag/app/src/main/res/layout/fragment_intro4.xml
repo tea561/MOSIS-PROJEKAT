@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Intro4Fragment">
+
+    <ImageView
+        android:id="@+id/imageViewIntro4"
+        android:layout_width="wrap_content"
+        android:layout_height="457dp"
+        android:src="@drawable/intro4" />
+
+    <TextView
+        android:id="@+id/textViewIntro4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/intro4"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewIntroDesc4"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/intro4_desc"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/buttonGetStarted"
+        android:layout_width="234dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="92dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="@color/yellow"
+        android:text="@string/get_started"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+</LinearLayout>

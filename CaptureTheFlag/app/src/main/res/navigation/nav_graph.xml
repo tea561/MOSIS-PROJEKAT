@@ -44,6 +44,30 @@
         android:name="elfak.mosis.capturetheflag.Intro2Fragment"
         android:label="@string/intro2_fragment_label"
         tools:layout="@layout/fragment_intro2">
+        <action
+            android:id="@+id/action_Intro2Fragment_to_Intro3Fragment"
+            app:destination="@id/Intro3Fragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/Intro3Fragment"
+        android:name="elfak.mosis.capturetheflag.Intro3Fragment"
+        android:label="@string/intro3_fragment_label"
+        tools:layout="@layout/fragment_intro3">
+
+        <action
+            android:id="@+id/action_Intro3Fragment_to_Intro4Fragment"
+            app:destination="@id/Intro4Fragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/Intro4Fragment"
+        android:name="elfak.mosis.capturetheflag.Intro4Fragment"
+        android:label="@string/intro4_fragment_label"
+        tools:layout="@layout/fragment_intro4">
+
 
     </fragment>
 </navigation>

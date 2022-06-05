@@ -1,22 +1,27 @@
 package elfak.mosis.capturetheflag
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentFirstBinding
+import elfak.mosis.capturetheflag.model.UserViewModel
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -27,9 +32,12 @@ class FirstFragment : Fragment() {
     private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
     private var _binding: FragmentFirstBinding? = null
 
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,10 +61,10 @@ class FirstFragment : Fragment() {
         val loginButton: Button = requireView().findViewById<Button>(R.id.loginButton)
 
         loginButton.setOnClickListener {
-            val username: String = inputUsername.text.toString()
+            val phoneNum: String = inputUsername.text.toString()
             val password: String = inputPassword.text.toString()
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (phoneNum.isEmpty() || password.isEmpty()) {
                 Toast.makeText(
                     this.context,
                     "Please enter username and password",
@@ -69,8 +77,8 @@ class FirstFragment : Fragment() {
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.hasChild(username)) {
-                            val dbPassword = snapshot.child(username).child("password")
+                        if (snapshot.hasChild(phoneNum)) {
+                            val dbPassword = snapshot.child(phoneNum).child("password")
                                 .getValue(String::class.java)
                             if (dbPassword.equals(password)) {
                                 Toast.makeText(
@@ -78,6 +86,15 @@ class FirstFragment : Fragment() {
                                     "Successfully logged in",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                var currentUser = snapshot.child(phoneNum).getValue(User::class.java)
+                                currentUser?.phoneNum = phoneNum
+                                Toast.makeText(
+                                    view.context,
+                                    "Successfully logged in",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                userViewModel.selectedUser = currentUser
+
                             } else {
                                 Toast.makeText(view.context, "Wrong password", Toast.LENGTH_SHORT)
                                     .show()
@@ -91,6 +108,16 @@ class FirstFragment : Fragment() {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
     }
 
     override fun onDestroyView() {

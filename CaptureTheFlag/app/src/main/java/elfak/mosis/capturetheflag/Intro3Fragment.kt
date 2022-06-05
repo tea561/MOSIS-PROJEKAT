@@ -1,32 +1,37 @@
 package elfak.mosis.capturetheflag
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.databinding.FragmentIntro2Binding
+import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
+import elfak.mosis.capturetheflag.model.UserViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Intro3Fragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Intro3Fragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private val database = Firebase.database
+    private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
+    private val userViewModel: UserViewModel by activityViewModels()
+
+    private var _binding: FragmentIntro3Binding? = null
+
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -34,26 +39,62 @@ class Intro3Fragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_intro3, container, false)
+        _binding = FragmentIntro3Binding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Intro3Fragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Intro3Fragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.buttonSkip3.setOnClickListener {
+            findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
+        }
+
+        binding.buttonNext3.setOnClickListener {
+            findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
+        }
+
+        val editDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
+
+        val nextButton: Button = requireView().findViewById<Button>(R.id.buttonNext3)
+        nextButton.setOnClickListener{
+            val desc: String = editDesc.text.toString()
+
+            val key = dbRef.child("users").push().key
+            if (key == null) {
+                Log.w(TAG, "Couldn't get push key for posts")
             }
+            else {
+
+                val id: String = userViewModel.selectedUser!!.phoneNum
+                /*dbRef.child("users").child(id).get().addOnSuccessListener {
+                    val temp = it.value
+                    val user : User = it.value as User
+                    user.desc = desc
+
+                    val userValues = user.toMap()
+                    val childUpdates = hashMapOf<String, Any>(
+                        "/users/$key" to userValues
+                    )
+
+                    dbRef.updateChildren(childUpdates)
+                }*/
+                dbRef.child("users").child(id).child("desc").setValue(desc)
+
+
+            }
+        }
     }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+
 }

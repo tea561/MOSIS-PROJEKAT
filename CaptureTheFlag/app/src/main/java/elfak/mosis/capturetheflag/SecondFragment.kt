@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
@@ -17,7 +19,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentSecondBinding
+import elfak.mosis.capturetheflag.model.UserViewModel
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -32,6 +36,8 @@ class SecondFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -165,7 +171,11 @@ class SecondFragment : Fragment() {
                         dbRef.child("users").child(phoneNum).child("lastName").setValue(lastName)
                         dbRef.child("users").child(phoneNum).child("username").setValue(username)
                         dbRef.child("users").child(phoneNum).child("password").setValue(password)
+                        dbRef.child("users").child(phoneNum).child("desc").setValue("")
+                        dbRef.child("users").child(phoneNum).child("imgUrl").setValue("")
 
+                        val currentUser = User(firstName, lastName, phoneNum, "", "", username)
+                        userViewModel.selectedUser = currentUser
                         Toast.makeText(view.context, "User registered successfully", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_SecondFragment_to_Intro1Fragment)
                     }
@@ -178,6 +188,16 @@ class SecondFragment : Fragment() {
 
 
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
     }
 
     override fun onDestroyView() {

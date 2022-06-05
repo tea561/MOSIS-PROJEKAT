@@ -6,6 +6,8 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="intro1_fragment_label">Intro1 Fragment</string>
     <string name="intro2_fragment_label">Intro2 Fragment</string>
+    <string name="intro3_fragment_label">Intro3 Fragment</string>
+    <string name="intro4_fragment_label">Intro4 Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -25,4 +27,7 @@
     <string name="intro2_desc">It will be easier for your friends to find you.</string>
     <string name="take_a_photo">Take a photo</string>
     <string name="intro3">Tell us about yourself!</string>
+    <string name="intro4">You\'re all set!</string>
+    <string name="intro4_desc">Go find your friends and get ready for new conquests!</string>
+    <string name="get_started">Get started</string>
 </resources>

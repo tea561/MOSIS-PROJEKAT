@@ -70,7 +70,7 @@
     <Button
         android:id="@+id/buttonTakeAPhoto"
         android:layout_width="234dp"
-        android:layout_height="46dp"
+        android:layout_height="48dp"
         android:layout_marginTop="36dp"
         android:layout_marginBottom="50dp"
         android:backgroundTint="@color/orange"
