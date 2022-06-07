@@ -1,6 +1,7 @@
 package elfak.mosis.capturetheflag
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +74,8 @@ class FirstFragment : Fragment() {
             } else {
                 dbRef.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+                        //TODO("Not yet implemented")
+                        Log.d("Login", "DB Login Error - onCancelled")
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -86,6 +88,7 @@ class FirstFragment : Fragment() {
                                     "Successfully logged in",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                // FIXME: popraviti ViewModel tako da podržava getValue
                                 var currentUser = snapshot.child(phoneNum).getValue(User::class.java)
                                 currentUser?.phoneNum = phoneNum
                                 Toast.makeText(

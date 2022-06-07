@@ -32,12 +32,19 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+        binding.fab.hide()
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            if (destination.id == R.id.SecondFragment)
-                binding.fab.hide()
-            else
-                binding.fab.show()
+/*            if ( destination.id == R.id.FirstFragment
+                || destination.id == R.id.Intro1Fragment
+                || destination.id == R.id.Intro2Fragment
+                || destination.id == R.id.Intro3Fragment
+                || destination.id == R.id.Intro4Fragment)999666333
+              else
+                binding.fab.show() */
+
+            // TODO: update with added fab for map view
+
         }
     }
 
