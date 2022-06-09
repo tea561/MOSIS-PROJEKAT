@@ -1,10 +1,11 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.profile
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import elfak.mosis.capturetheflag.R
 
 class ProfileFragment : Fragment() {
 

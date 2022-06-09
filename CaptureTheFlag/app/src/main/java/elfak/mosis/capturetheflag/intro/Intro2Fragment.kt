@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.intro
 
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
@@ -15,9 +15,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
+import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentIntro2Binding
-import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
 import elfak.mosis.capturetheflag.model.UserViewModel
 
 private const val REQUEST_IMAGE_CAPTURE = 1

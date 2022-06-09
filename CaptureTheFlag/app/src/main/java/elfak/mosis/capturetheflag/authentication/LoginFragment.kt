@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.authentication
 
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 import elfak.mosis.capturetheflag.model.UserViewModel

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/LoginFragment"
-        android:name="elfak.mosis.capturetheflag.LoginFragment"
+        android:name="elfak.mosis.capturetheflag.authentication.LoginFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_login">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SignupFragment"
-        android:name="elfak.mosis.capturetheflag.SignupFragment"
+        android:name="elfak.mosis.capturetheflag.authentication.SignupFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_signup">
 
@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/Intro1Fragment"
-        android:name="elfak.mosis.capturetheflag.Intro1Fragment"
+        android:name="elfak.mosis.capturetheflag.intro.Intro1Fragment"
         android:label="@string/intro1_fragment_label"
         tools:layout="@layout/fragment_intro1">
 
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/Intro2Fragment"
-        android:name="elfak.mosis.capturetheflag.Intro2Fragment"
+        android:name="elfak.mosis.capturetheflag.intro.Intro2Fragment"
         android:label="@string/intro2_fragment_label"
         tools:layout="@layout/fragment_intro2">
         <action
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/Intro3Fragment"
-        android:name="elfak.mosis.capturetheflag.Intro3Fragment"
+        android:name="elfak.mosis.capturetheflag.intro.Intro3Fragment"
         android:label="@string/intro3_fragment_label"
         tools:layout="@layout/fragment_intro3">
 
@@ -64,7 +64,7 @@
 
     <fragment
         android:id="@+id/Intro4Fragment"
-        android:name="elfak.mosis.capturetheflag.Intro4Fragment"
+        android:name="elfak.mosis.capturetheflag.intro.Intro4Fragment"
         android:label="@string/intro4_fragment_label"
         tools:layout="@layout/fragment_intro4">
 

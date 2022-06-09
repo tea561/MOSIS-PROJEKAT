@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Intro2Fragment">
+    tools:context=".intro.Intro2Fragment">
 
     <Button
         android:id="@+id/buttonSkip2"

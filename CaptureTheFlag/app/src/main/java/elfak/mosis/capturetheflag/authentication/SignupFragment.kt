@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.authentication
 
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentSignupBinding
 import elfak.mosis.capturetheflag.model.UserViewModel
@@ -56,22 +57,24 @@ class SignupFragment : Fragment() {
             findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)
         }
 
+        val inputsList: ArrayList<EditText> = ArrayList()
         val inputUsername: EditText = requireView().findViewById<TextInputEditText>(R.id.username)
+        inputsList.add(inputUsername)
         val inputPassword: EditText = requireView().findViewById<TextInputEditText>(R.id.password)
+        inputsList.add(inputPassword)
         val inputFirstName: EditText = requireView().findViewById<TextInputEditText>(R.id.firstname)
+        inputsList.add(inputFirstName)
         val inputLastName: EditText = requireView().findViewById<TextInputEditText>(R.id.lastname)
+        inputsList.add(inputLastName)
         val inputPhoneNum: EditText = requireView().findViewById<TextInputEditText>(R.id.phoneNum)
+        inputsList.add(inputPhoneNum)
+
         val buttonSignup : Button = requireView().findViewById(R.id.buttonSignup)
         buttonSignup.isEnabled = false
 
-        // TODO: proveriti da li ove provere mogu da se optimizuju
         inputUsername.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
-                        && (inputPassword.text.isNotEmpty())
-                        && (inputFirstName.text.isNotEmpty())
-                        && (inputLastName.text.isNotEmpty())
-                        && (inputPhoneNum.text.isNotEmpty())
+                enableSignupButton(buttonSignup, inputsList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -81,11 +84,7 @@ class SignupFragment : Fragment() {
 
         inputPassword.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
-                        && (inputPassword.text.isNotEmpty())
-                        && (inputFirstName.text.isNotEmpty())
-                        && (inputLastName.text.isNotEmpty())
-                        && (inputPhoneNum.text.isNotEmpty())
+                enableSignupButton(buttonSignup, inputsList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -95,11 +94,7 @@ class SignupFragment : Fragment() {
 
         inputFirstName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
-                        && (inputPassword.text.isNotEmpty())
-                        && (inputFirstName.text.isNotEmpty())
-                        && (inputLastName.text.isNotEmpty())
-                        && (inputPhoneNum.text.isNotEmpty())
+                enableSignupButton(buttonSignup, inputsList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -109,11 +104,7 @@ class SignupFragment : Fragment() {
 
         inputLastName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
-                        && (inputPassword.text.isNotEmpty())
-                        && (inputFirstName.text.isNotEmpty())
-                        && (inputLastName.text.isNotEmpty())
-                        && (inputPhoneNum.text.isNotEmpty())
+                enableSignupButton(buttonSignup, inputsList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -123,11 +114,7 @@ class SignupFragment : Fragment() {
 
         inputPhoneNum.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
-                        && (inputPassword.text.isNotEmpty())
-                        && (inputFirstName.text.isNotEmpty())
-                        && (inputLastName.text.isNotEmpty())
-                        && (inputPhoneNum.text.isNotEmpty())
+                enableSignupButton(buttonSignup, inputsList)
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -186,5 +173,9 @@ class SignupFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun enableSignupButton(buttonSignup: Button, inputs: List<EditText>) {
+        buttonSignup.isEnabled = inputs.fold(true){acc: Boolean, element -> acc && element.text!!.isNotEmpty()}
     }
 }

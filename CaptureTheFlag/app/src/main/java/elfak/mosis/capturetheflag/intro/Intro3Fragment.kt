@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.intro
 
 import android.content.ContentValues.TAG
 import android.os.Bundle
@@ -15,8 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import elfak.mosis.capturetheflag.data.User
-import elfak.mosis.capturetheflag.databinding.FragmentIntro2Binding
+import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
 import elfak.mosis.capturetheflag.model.UserViewModel
 
@@ -37,7 +36,7 @@ class Intro3Fragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentIntro3Binding.inflate(inflater, container, false)
         return binding.root
@@ -56,7 +55,7 @@ class Intro3Fragment : Fragment() {
 
         val editDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
 
-        val nextButton: Button = requireView().findViewById<Button>(R.id.buttonNext3)
+        val nextButton: Button = requireView().findViewById(R.id.buttonNext3)
         nextButton.setOnClickListener{
             val desc: String = editDesc.text.toString()
 

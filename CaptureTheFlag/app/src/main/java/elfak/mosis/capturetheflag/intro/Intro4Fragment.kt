@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag
+package elfak.mosis.capturetheflag.intro
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
+import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentIntro4Binding
 
 
