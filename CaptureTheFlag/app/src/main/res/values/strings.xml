@@ -34,5 +34,8 @@
     <string name="create_game">Create Game</string>
     <string name="find_friend">Find friend</string>
     <string name="how_to_play">How to play</string>
+    <string name="add_friend">Add friend</string>
+    <string name="first_and_last_name">First Last</string>
+    <string name="about_me">About me</string>
 
 </resources>
