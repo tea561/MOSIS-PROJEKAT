@@ -2,8 +2,8 @@ package elfak.mosis.capturetheflag.data
 
 import com.google.firebase.database.Exclude
 
-data class User(var firstName: String? = null, var lastName: String? = null, var phoneNum: String, val imgUrl: String? = null,
-                var desc: String? = null, var username: String? = null)
+data class User(var firstName: String? = "", var lastName: String? = "", var phoneNum: String = "", val imgUrl: String? = "",
+                var desc: String? = "", var username: String? = "")
 {
     @Exclude
     fun toMap(): Map<String, Any?> {

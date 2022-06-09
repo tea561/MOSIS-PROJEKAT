@@ -20,18 +20,18 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
-import elfak.mosis.capturetheflag.databinding.FragmentSecondBinding
+import elfak.mosis.capturetheflag.databinding.FragmentSignupBinding
 import elfak.mosis.capturetheflag.model.UserViewModel
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment() {
+class SignupFragment : Fragment() {
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentSignupBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -42,9 +42,9 @@ class SecondFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentSignupBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -53,7 +53,7 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSecond.setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+            findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)
         }
 
         val inputUsername: EditText = requireView().findViewById<TextInputEditText>(R.id.username)
@@ -61,94 +61,77 @@ class SecondFragment : Fragment() {
         val inputFirstName: EditText = requireView().findViewById<TextInputEditText>(R.id.firstname)
         val inputLastName: EditText = requireView().findViewById<TextInputEditText>(R.id.lastname)
         val inputPhoneNum: EditText = requireView().findViewById<TextInputEditText>(R.id.phoneNum)
-
-        val buttonSignup : Button = requireView().findViewById<Button>(R.id.buttonSignup)
+        val buttonSignup : Button = requireView().findViewById(R.id.buttonSignup)
         buttonSignup.isEnabled = false
-        
+
+        // TODO: proveriti da li ove provere mogu da se optimizuju
         inputUsername.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-                        && (inputPhoneNum.text.length > 0)
+                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
+                        && (inputPassword.text.isNotEmpty())
+                        && (inputFirstName.text.isNotEmpty())
+                        && (inputLastName.text.isNotEmpty())
+                        && (inputPhoneNum.text.isNotEmpty())
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
         })
 
         inputPassword.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-                        && (inputPhoneNum.text.length > 0)
+                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
+                        && (inputPassword.text.isNotEmpty())
+                        && (inputFirstName.text.isNotEmpty())
+                        && (inputLastName.text.isNotEmpty())
+                        && (inputPhoneNum.text.isNotEmpty())
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
         })
 
         inputFirstName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-                        && (inputPhoneNum.text.length > 0)
+                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
+                        && (inputPassword.text.isNotEmpty())
+                        && (inputFirstName.text.isNotEmpty())
+                        && (inputLastName.text.isNotEmpty())
+                        && (inputPhoneNum.text.isNotEmpty())
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
         })
 
         inputLastName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-                        && (inputPhoneNum.text.length > 0)
+                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
+                        && (inputPassword.text.isNotEmpty())
+                        && (inputFirstName.text.isNotEmpty())
+                        && (inputLastName.text.isNotEmpty())
+                        && (inputPhoneNum.text.isNotEmpty())
             }
-
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
         })
 
         inputPhoneNum.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                buttonSignup.isEnabled = (inputUsername.text.length > 0)
-                        && (inputPassword.text.length > 0)
-                        && (inputFirstName.text.length > 0)
-                        && (inputLastName.text.length > 0)
-                        && (inputPhoneNum.text.length > 0)
+                buttonSignup.isEnabled = (inputUsername.text.isNotEmpty())
+                        && (inputPassword.text.isNotEmpty())
+                        && (inputFirstName.text.isNotEmpty())
+                        && (inputLastName.text.isNotEmpty())
+                        && (inputPhoneNum.text.isNotEmpty())
             }
-
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
             }
         })
 
@@ -177,7 +160,7 @@ class SecondFragment : Fragment() {
                         val currentUser = User(firstName, lastName, phoneNum, "", "", username)
                         userViewModel.selectedUser = currentUser
                         Toast.makeText(view.context, "User registered successfully", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_SecondFragment_to_Intro1Fragment)
+                        findNavController().navigate(R.id.action_SignupFragment_to_Intro1Fragment)
                     }
                 }
 

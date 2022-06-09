@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import elfak.mosis.capturetheflag.databinding.FragmentFirstBinding
+import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 
 import elfak.mosis.capturetheflag.databinding.FragmentIntro1Binding
 

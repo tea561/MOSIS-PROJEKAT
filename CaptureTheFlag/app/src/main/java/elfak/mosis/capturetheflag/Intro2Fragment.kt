@@ -15,7 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import elfak.mosis.capturetheflag.databinding.FragmentFirstBinding
+import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 import elfak.mosis.capturetheflag.databinding.FragmentIntro2Binding
 import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
 import elfak.mosis.capturetheflag.model.UserViewModel

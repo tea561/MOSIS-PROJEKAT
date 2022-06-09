@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -20,18 +19,18 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
-import elfak.mosis.capturetheflag.databinding.FragmentFirstBinding
+import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 import elfak.mosis.capturetheflag.model.UserViewModel
 
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class LoginFragment : Fragment() {
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentLoginBinding? = null
 
 
     // This property is only valid between onCreateView and
@@ -43,9 +42,9 @@ class FirstFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -54,12 +53,12 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.createAccButton.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_LoginFragment_to_SignupFragment)
         }
 
         val inputUsername: EditText = requireView().findViewById<TextInputEditText>(R.id.username)
         val inputPassword: EditText = requireView().findViewById<TextInputEditText>(R.id.password)
-        val loginButton: Button = requireView().findViewById<Button>(R.id.loginButton)
+        val loginButton: Button = requireView().findViewById(R.id.loginButton)
 
         loginButton.setOnClickListener {
             val phoneNum: String = inputUsername.text.toString()
@@ -88,8 +87,8 @@ class FirstFragment : Fragment() {
                                     "Successfully logged in",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                // FIXME: popraviti ViewModel tako da podržava getValue
-                                var currentUser = snapshot.child(phoneNum).getValue(User::class.java)
+
+                                val currentUser = snapshot.child(phoneNum).getValue(User::class.java)
                                 currentUser?.phoneNum = phoneNum
                                 Toast.makeText(
                                     view.context,
