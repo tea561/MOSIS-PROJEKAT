@@ -18,7 +18,7 @@
     <string name="login_button">Log In</string>
     <string name="create_acc_button">Create now</string>
     <string name="no_acc_label">Don\'t have account?</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="welcome">Welcome To Capture The Flag</string>
     <string name="welcome_desc">Bla bla bla dobrodosli da</string>
@@ -30,4 +30,9 @@
     <string name="intro4">You\'re all set!</string>
     <string name="intro4_desc">Go find your friends and get ready for new conquests!</string>
     <string name="get_started">Get started</string>
+    <string name="title">Capture The Flag</string>
+    <string name="create_game">Create Game</string>
+    <string name="find_friend">Find friend</string>
+    <string name="how_to_play">How to play</string>
+
 </resources>
