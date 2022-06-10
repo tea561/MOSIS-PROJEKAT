@@ -40,7 +40,7 @@ class UserViewModel : ViewModel() {
                                     _authState.value = AuthState.Success
                                 } else {
                                     task.exception?.let {
-                                        Log.i("AUTH", "Signup Error: ${it.message}")
+                                        Log.e("AUTH", "Signup Error: ${it.message}")
                                         _authState.value = AuthState.AuthError(it.message)
                                     }
                                 }

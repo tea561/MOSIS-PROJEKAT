@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
@@ -45,18 +44,8 @@ class Intro3Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonSkip3.setOnClickListener {
-            findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
-        }
-
-        binding.buttonNext3.setOnClickListener {
-            findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
-        }
-
         val editDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
-
-        val nextButton: Button = requireView().findViewById(R.id.buttonNext3)
-        nextButton.setOnClickListener{
+        binding.buttonNext3.setOnClickListener {
             val desc: String = editDesc.text.toString()
 
             val key = dbRef.child("users").push().key
@@ -64,24 +53,14 @@ class Intro3Fragment : Fragment() {
                 Log.w(TAG, "Couldn't get push key for posts")
             }
             else {
-
-                val id: String = userViewModel.selectedUser!!.phoneNum
-                /*dbRef.child("users").child(id).get().addOnSuccessListener {
-                    val temp = it.value
-                    val user : User = it.value as User
-                    user.desc = desc
-
-                    val userValues = user.toMap()
-                    val childUpdates = hashMapOf<String, Any>(
-                        "/users/$key" to userValues
-                    )
-
-                    dbRef.updateChildren(childUpdates)
-                }*/
+                val id: String = userViewModel.selectedUser!!.uid
                 dbRef.child("users").child(id).child("desc").setValue(desc)
-
-
+                findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
             }
+        }
+
+        binding.buttonSkip3.setOnClickListener {
+            findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
         }
     }
 
@@ -94,6 +73,4 @@ class Intro3Fragment : Fragment() {
         super.onStop()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
     }
-
-
 }
