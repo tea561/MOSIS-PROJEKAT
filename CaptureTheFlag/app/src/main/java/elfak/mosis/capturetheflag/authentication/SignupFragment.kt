@@ -12,16 +12,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentSignupBinding
+import elfak.mosis.capturetheflag.model.AuthState
 import elfak.mosis.capturetheflag.model.UserViewModel
 
 /**
@@ -29,8 +26,8 @@ import elfak.mosis.capturetheflag.model.UserViewModel
  */
 class SignupFragment : Fragment() {
 
-    private val database = Firebase.database
-    private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
+    /*private val database = Firebase.database
+    private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")*/
 
     private var _binding: FragmentSignupBinding? = null
 
@@ -129,9 +126,15 @@ class SignupFragment : Fragment() {
             val lastName: String = inputLastName.text.toString()
             val phoneNum: String = inputPhoneNum.text.toString()
 
+            val user = User(firstName, lastName, phoneNum, "", "", username)
+
+            userViewModel.signupUser(user, password)
+
+
+
             //Toast.makeText(this.context, "Signup clicked. $username $password $firstName $lastName $phoneNum", Toast.LENGTH_SHORT).show()
 
-            dbRef.child("users").addListenerForSingleValueEvent(object: ValueEventListener {
+            /*dbRef.child("users").addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(snapshot.hasChild(phoneNum)){
                         Toast.makeText(view.context, "Phone is already registered", Toast.LENGTH_SHORT).show()
@@ -154,10 +157,21 @@ class SignupFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {
 
                 }
-            })
+            })*/
 
 
         }
+
+        val authStateObserver = Observer<AuthState> { state ->
+            if (state == AuthState.Success) {
+                Toast.makeText(view.context, "User registered successfully", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_SignupFragment_to_Intro1Fragment)
+            }
+            if (state is AuthState.AuthError) {
+                Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+        userViewModel.authState.observe(viewLifecycleOwner, authStateObserver)
     }
 
     override fun onResume() {
@@ -172,6 +186,7 @@ class SignupFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        userViewModel.authState.removeObservers(viewLifecycleOwner)
         _binding = null
     }
 
