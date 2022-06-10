@@ -50,10 +50,6 @@ class SignupFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonSecond.setOnClickListener {
-            findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)
-        }
-
         val inputsList: ArrayList<EditText> = ArrayList()
         val inputUsername: EditText = requireView().findViewById<TextInputEditText>(R.id.username)
         inputsList.add(inputUsername)
@@ -78,7 +74,6 @@ class SignupFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
-
         inputPassword.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 enableSignupButton(buttonSignup, inputsList)
@@ -88,7 +83,6 @@ class SignupFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
-
         inputFirstName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 enableSignupButton(buttonSignup, inputsList)
@@ -98,7 +92,6 @@ class SignupFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
-
         inputLastName.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 enableSignupButton(buttonSignup, inputsList)
@@ -108,7 +101,6 @@ class SignupFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
-
         inputPhoneNum.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 enableSignupButton(buttonSignup, inputsList)
@@ -126,40 +118,9 @@ class SignupFragment : Fragment() {
             val lastName: String = inputLastName.text.toString()
             val phoneNum: String = inputPhoneNum.text.toString()
 
-            val user = User(firstName, lastName, phoneNum, "", "", username)
+            val user = User(firstName, lastName, phoneNum, "", "", username, "")
 
             userViewModel.signupUser(user, password)
-
-
-
-            //Toast.makeText(this.context, "Signup clicked. $username $password $firstName $lastName $phoneNum", Toast.LENGTH_SHORT).show()
-
-            /*dbRef.child("users").addListenerForSingleValueEvent(object: ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if(snapshot.hasChild(phoneNum)){
-                        Toast.makeText(view.context, "Phone is already registered", Toast.LENGTH_SHORT).show()
-                    }
-                    else {
-                        dbRef.child("users").child(phoneNum).child("firstName").setValue(firstName)
-                        dbRef.child("users").child(phoneNum).child("lastName").setValue(lastName)
-                        dbRef.child("users").child(phoneNum).child("username").setValue(username)
-                        dbRef.child("users").child(phoneNum).child("password").setValue(password)
-                        dbRef.child("users").child(phoneNum).child("desc").setValue("")
-                        dbRef.child("users").child(phoneNum).child("imgUrl").setValue("")
-
-                        val currentUser = User(firstName, lastName, phoneNum, "", "", username)
-                        userViewModel.selectedUser = currentUser
-                        Toast.makeText(view.context, "User registered successfully", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_SignupFragment_to_Intro1Fragment)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })*/
-
-
         }
 
         val authStateObserver = Observer<AuthState> { state ->

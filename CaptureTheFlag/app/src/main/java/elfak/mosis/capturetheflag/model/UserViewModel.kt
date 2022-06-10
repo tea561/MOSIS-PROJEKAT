@@ -33,6 +33,7 @@ class UserViewModel : ViewModel() {
                         auth.createUserWithEmailAndPassword("${user.username}@capturetheflag.mosis", password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    user.uid = auth.currentUser!!.uid
                                     addUserToDB(user)
                                     Log.i("AUTH", "Signup Successful: ${user.username}, phone ${user.phoneNum}")
                                     selectedUser = user
@@ -54,7 +55,36 @@ class UserViewModel : ViewModel() {
     }
 
     fun loginUser(username: String, password: String) {
-
+        if (validateLogin(username, password)) {
+            auth.signInWithEmailAndPassword("${username}@capturetheflag.mosis", password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        dbRef.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(error: DatabaseError) {
+                                _authState.value = AuthState.AuthError(error.message)
+                                Log.e("AUTH", error.message)
+                            }
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val uid = auth.currentUser!!.uid
+                                if (snapshot.hasChild(uid)) {
+                                    val currentUser = snapshot.child(uid).getValue(User::class.java)
+                                    currentUser?.uid = uid
+                                    selectedUser = currentUser
+                                    Log.i("AUTH", "Login Successful: ${currentUser!!.username}, ${currentUser.uid}")
+                                    _authState.value = AuthState.Success
+                                } else {
+                                    _authState.value = AuthState.AuthError("Login Error: user does not exist in database.")
+                                }
+                            }
+                        })
+                    } else {
+                        task.exception?.let {
+                            Log.i("AUTH", "Login Error: ${it.message}")
+                            _authState.value = AuthState.AuthError(it.message)
+                        }
+                    }
+                }
+        }
     }
 
     private fun validateLogin(username: String, password: String): Boolean {
@@ -94,14 +124,13 @@ class UserViewModel : ViewModel() {
     }
 
     private fun addUserToDB(user: User) {
-        dbRef.child("users").child(user.phoneNum).child("firstName").setValue(user.firstName)
-        dbRef.child("users").child(user.phoneNum).child("lastName").setValue(user.lastName)
-        dbRef.child("users").child(user.phoneNum).child("username").setValue(user.username)
-        dbRef.child("users").child(user.phoneNum).child("desc").setValue("")
-        dbRef.child("users").child(user.phoneNum).child("imgUrl").setValue("")
+        dbRef.child("users").child(user.uid).child("firstName").setValue(user.firstName)
+        dbRef.child("users").child(user.uid).child("lastName").setValue(user.lastName)
+        dbRef.child("users").child(user.uid).child("username").setValue(user.username)
+        dbRef.child("users").child(user.uid).child("phoneNum").setValue(user.phoneNum)
+        dbRef.child("users").child(user.uid).child("desc").setValue("")
+        dbRef.child("users").child(user.uid).child("imgUrl").setValue("")
     }
-
-    //TODO: dodati firebase auth
 }
 
 sealed class AuthState {

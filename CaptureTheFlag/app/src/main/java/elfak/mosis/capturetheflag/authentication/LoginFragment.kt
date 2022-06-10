@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
@@ -21,6 +22,7 @@ import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
+import elfak.mosis.capturetheflag.model.AuthState
 import elfak.mosis.capturetheflag.model.UserViewModel
 
 
@@ -62,55 +64,30 @@ class LoginFragment : Fragment() {
         val loginButton: Button = requireView().findViewById(R.id.loginButton)
 
         loginButton.setOnClickListener {
-            val phoneNum: String = inputUsername.text.toString()
+            val username: String = inputUsername.text.toString()
             val password: String = inputPassword.text.toString()
 
-            if (phoneNum.isEmpty() || password.isEmpty()) {
+            if (username.isBlank() || password.isBlank()) {
                 Toast.makeText(
                     this.context,
                     "Please enter username and password",
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                dbRef.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                        //TODO("Not yet implemented")
-                        Log.d("Login", "DB Login Error - onCancelled")
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.hasChild(phoneNum)) {
-                            val dbPassword = snapshot.child(phoneNum).child("password")
-                                .getValue(String::class.java)
-                            if (dbPassword.equals(password)) {
-                                Toast.makeText(
-                                    view.context,
-                                    "Successfully logged in",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                                val currentUser = snapshot.child(phoneNum).getValue(User::class.java)
-                                currentUser?.phoneNum = phoneNum
-                                Toast.makeText(
-                                    view.context,
-                                    "Successfully logged in",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                userViewModel.selectedUser = currentUser
-
-                            } else {
-                                Toast.makeText(view.context, "Wrong password", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        } else {
-                            Toast.makeText(view.context, "User not found", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                })
+                userViewModel.loginUser(username, password)
             }
         }
 
+        val authStateObserver = Observer<AuthState> { state ->
+            if (state == AuthState.Success) {
+                Toast.makeText(view.context, "User logged in! Welcome, ${userViewModel.selectedUser!!.username}", Toast.LENGTH_SHORT).show()
+                // TODO: navigate to MapView
+            }
+            if (state is AuthState.AuthError) {
+                Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+        userViewModel.authState.observe(viewLifecycleOwner, authStateObserver)
     }
 
     override fun onResume() {
@@ -125,6 +102,7 @@ class LoginFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        userViewModel.authState.removeObservers(viewLifecycleOwner)
         _binding = null
     }
 }
