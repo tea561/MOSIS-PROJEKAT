@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.Image
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.fragment.app.Fragment
@@ -34,7 +35,7 @@ class Intro2Fragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentIntro2Binding.inflate(inflater, container, false)
         return binding.root
@@ -43,8 +44,7 @@ class Intro2Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonTakeAPhoto: Button = requireView().findViewById<Button>(R.id.buttonTakeAPhoto)
-        val buttonSkip: Button = requireView().findViewById<Button>(R.id.buttonSkip2)
+        val buttonTakeAPhoto: Button = requireView().findViewById(R.id.buttonTakeAPhoto)
 
         binding.buttonSkip2.setOnClickListener {
             findNavController().navigate(R.id.action_Intro2Fragment_to_Intro3Fragment)
@@ -55,22 +55,18 @@ class Intro2Fragment : Fragment() {
         buttonTakeAPhoto.setOnClickListener {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             try {
-                startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE)
+                activity?.startActivityFromFragment(this, cameraIntent, REQUEST_IMAGE_CAPTURE)
             } catch (e: ActivityNotFoundException) {
                 // display error state to the user
             }
         }
-
-
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val imageBitmap = data?.extras?.get("data") as Bitmap
-
-            //TODO:Send to Intro2.5
+            val image = data?.extras?.get("data") as Bitmap
+            userViewModel.setImage(image)
+            findNavController().navigate("")
         }
     }
 

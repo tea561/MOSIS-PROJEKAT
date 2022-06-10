@@ -1,5 +1,7 @@
 package elfak.mosis.capturetheflag.model
 
+import android.content.ContentValues
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,12 +18,16 @@ import elfak.mosis.capturetheflag.data.User
 class UserViewModel : ViewModel() {
     var selectedUser: User? = null
 
+    private val _image = MutableLiveData<Bitmap>()
+    var image: LiveData<Bitmap> = _image
+
     private var auth: FirebaseAuth = Firebase.auth
     private val _authState by lazy { MutableLiveData<AuthState>(AuthState.Idle) }
     val authState: LiveData<AuthState> = _authState
 
     private val database = Firebase.database
-    private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
+    private val dbRef = database.getReferenceFromUrl(
+        "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
     fun signupUser(user: User, password: String) {
         if (validateSignup(user, password)) {
@@ -85,6 +91,23 @@ class UserViewModel : ViewModel() {
                     }
                 }
         }
+    }
+
+    fun updateUserData(parameterName: String, parameterValue: Any) : Boolean {
+        val key = dbRef.child("users").push().key
+        if (key == null) {
+            Log.w(ContentValues.TAG, "Couldn't get push key for posts")
+        }
+        else {
+            val id: String = selectedUser!!.uid
+            dbRef.child("users").child(id).child(parameterName).setValue(parameterValue)
+            return true
+        }
+        return false
+    }
+
+    fun setImage(image: Bitmap) {
+        _image.value = image
     }
 
     private fun validateLogin(username: String, password: String): Boolean {

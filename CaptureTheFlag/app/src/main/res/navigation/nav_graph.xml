@@ -51,6 +51,17 @@
     </fragment>
 
     <fragment
+        android:id="@+id/Intro2ImageFragment"
+        android:name="elfak.mosis.capturetheflag.intro.Intro2ImageFragment"
+        android:label="Intro2 Image Fragment"
+        tools:layout="@layout/fragment_intro2_image">
+        <action
+            android:id="@+id/action_Intro2ImageFragment_to_Intro3Fragment"
+            app:destination="@id/Intro3Fragment" />
+
+    </fragment>
+
+    <fragment
         android:id="@+id/Intro3Fragment"
         android:name="elfak.mosis.capturetheflag.intro.Intro3Fragment"
         android:label="@string/intro3_fragment_label"

@@ -47,14 +47,7 @@ class Intro3Fragment : Fragment() {
         val editDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
         binding.buttonNext3.setOnClickListener {
             val desc: String = editDesc.text.toString()
-
-            val key = dbRef.child("users").push().key
-            if (key == null) {
-                Log.w(TAG, "Couldn't get push key for posts")
-            }
-            else {
-                val id: String = userViewModel.selectedUser!!.uid
-                dbRef.child("users").child(id).child("desc").setValue(desc)
+            if (userViewModel.updateUserData("desc", desc)) {
                 findNavController().navigate(R.id.action_Intro3Fragment_to_Intro4Fragment)
             }
         }
