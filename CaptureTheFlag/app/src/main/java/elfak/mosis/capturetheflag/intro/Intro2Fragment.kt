@@ -66,7 +66,7 @@ class Intro2Fragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val image = data?.extras?.get("data") as Bitmap
             userViewModel.setImage(image)
-            findNavController().navigate("")
+            findNavController().navigate(R.id.action_Intro2Fragment_to_Intro2ImageFragment)
         }
     }
 

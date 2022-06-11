@@ -12,8 +12,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.storage.ktx.storage
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
+import java.io.ByteArrayOutputStream
 
 class UserViewModel : ViewModel() {
     var selectedUser: User? = null
@@ -21,13 +23,17 @@ class UserViewModel : ViewModel() {
     private val _image = MutableLiveData<Bitmap>()
     var image: LiveData<Bitmap> = _image
 
-    private var auth: FirebaseAuth = Firebase.auth
     private val _authState by lazy { MutableLiveData<AuthState>(AuthState.Idle) }
     val authState: LiveData<AuthState> = _authState
+    private val _uploadState by lazy { MutableLiveData<StoreUploadState>(StoreUploadState.Idle) }
+    val uploadState: LiveData<StoreUploadState> = _uploadState
 
+    private var auth: FirebaseAuth = Firebase.auth
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
+    private val storage = Firebase.storage("gs://capturetheflag-56f1c.appspot.com")
+    private val storageRef = storage.reference
 
     fun signupUser(user: User, password: String) {
         if (validateSignup(user, password)) {
@@ -110,6 +116,31 @@ class UserViewModel : ViewModel() {
         _image.value = image
     }
 
+    fun uploadProfilePhoto() {
+        val photoRef = storageRef.child("profilePictures").child("${selectedUser!!.uid}.jpg")
+        val baos = ByteArrayOutputStream()
+        val bitmap = image.value
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        val uploadTask = photoRef.putBytes(data)
+
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception.let {
+                    _uploadState.value = StoreUploadState.UploadError("Upload error: ${it?.message}")
+                }
+            }
+            photoRef.downloadUrl
+        }.addOnCompleteListener() { task ->
+            if (task.isSuccessful) {
+                val photoUrl = task.result.toString()
+                updateUserData("imgUrl", photoUrl)
+                _uploadState.value =
+                    StoreUploadState.Success("Upload successful with image URL: $photoUrl")
+            }
+        }
+    }
+
     private fun validateLogin(username: String, password: String): Boolean {
         if (username.isBlank()) {
             _authState.value = AuthState.AuthError("Username blank or empty.")
@@ -161,4 +192,10 @@ sealed class AuthState {
 /*    object Loading : AuthState()*/
     object Success : AuthState()
     class AuthError(val message: String? = null) : AuthState()
+}
+
+sealed class StoreUploadState {
+    object Idle : StoreUploadState()
+    class Success(val message: String = "Upload Successful.") : StoreUploadState()
+    class UploadError(val message: String? = null) : StoreUploadState()
 }

@@ -44,9 +44,13 @@
         android:name="elfak.mosis.capturetheflag.intro.Intro2Fragment"
         android:label="@string/intro2_fragment_label"
         tools:layout="@layout/fragment_intro2">
+
         <action
             android:id="@+id/action_Intro2Fragment_to_Intro3Fragment"
             app:destination="@id/Intro3Fragment" />
+        <action
+            android:id="@+id/action_Intro2Fragment_to_Intro2ImageFragment"
+            app:destination="@id/Intro2ImageFragment" />
 
     </fragment>
 
@@ -58,6 +62,9 @@
         <action
             android:id="@+id/action_Intro2ImageFragment_to_Intro3Fragment"
             app:destination="@id/Intro3Fragment" />
+        <action
+            android:id="@+id/action_Intro2ImageFragment_to_Intro2Fragment"
+            app:destination="@id/Intro2Fragment" />
 
     </fragment>
 
