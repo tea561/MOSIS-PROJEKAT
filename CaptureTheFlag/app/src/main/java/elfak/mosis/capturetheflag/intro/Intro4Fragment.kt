@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentIntro4Binding
 
@@ -36,7 +37,7 @@ class Intro4Fragment : Fragment() {
 
         val buttonGetStarted: Button = requireView().findViewById(R.id.buttonGetStarted)
         buttonGetStarted.setOnClickListener {
-            Toast.makeText(view.context, "Get started", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_Intro4Fragment_to_MapFragment)
         }
     }
 

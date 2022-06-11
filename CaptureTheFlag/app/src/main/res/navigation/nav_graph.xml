@@ -14,6 +14,10 @@
         <action
             android:id="@+id/action_LoginFragment_to_SignupFragment"
             app:destination="@id/SignupFragment" />
+
+        <action
+            android:id="@+id/action_LoginFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
     </fragment>
     <fragment
         android:id="@+id/SignupFragment"
@@ -85,6 +89,18 @@
         android:name="elfak.mosis.capturetheflag.intro.Intro4Fragment"
         android:label="@string/intro4_fragment_label"
         tools:layout="@layout/fragment_intro4">
+
+        <action
+            android:id="@+id/action_Intro4Fragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/MapFragment"
+        android:name="elfak.mosis.capturetheflag.game.map.MapFragment"
+        android:label="@string/map_fragment_label"
+        tools:layout="@layout/fragment_map">
 
 
     </fragment>

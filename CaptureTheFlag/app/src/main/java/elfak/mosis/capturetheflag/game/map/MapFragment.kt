@@ -1,0 +1,91 @@
+package elfak.mosis.capturetheflag.game.map
+
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.lifecycle.ViewModelProvider
+import android.os.Bundle
+import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
+import elfak.mosis.capturetheflag.R
+import org.osmdroid.config.Configuration
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
+class MapFragment : Fragment() {
+
+    private lateinit var mapViewModel: MapViewModel
+    private lateinit var map: MapView
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if(isGranted){
+                setMyLocationOverlay()
+            }
+        }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_map, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val ctx: Context? = activity?.applicationContext
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
+        map = requireView().findViewById(R.id.map)
+
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_DENIED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        else {
+            setMyLocationOverlay()
+        }
+
+        map.setMultiTouchControls(true)
+        map.controller.setZoom(20.0)
+        map.controller.setCenter(GeoPoint(43.3209, 21.8958))
+
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        map.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        map.onResume()
+    }
+
+    private fun setMyLocationOverlay() {
+        val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(activity), map)
+        myLocationOverlay.enableMyLocation()
+        map.overlays.add(myLocationOverlay)
+    }
+
+}

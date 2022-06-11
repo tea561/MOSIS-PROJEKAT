@@ -131,7 +131,7 @@ class UserViewModel : ViewModel() {
                 }
             }
             photoRef.downloadUrl
-        }.addOnCompleteListener() { task ->
+        }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val photoUrl = task.result.toString()
                 updateUserData("imgUrl", photoUrl)
