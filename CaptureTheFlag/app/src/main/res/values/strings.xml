@@ -9,6 +9,7 @@
     <string name="intro3_fragment_label">Intro3 Fragment</string>
     <string name="intro4_fragment_label">Intro4 Fragment</string>
     <string name="map_fragment_label">Map Fragment</string>
+    <string name="profile_fragment_label">Profile</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -38,5 +39,10 @@
     <string name="add_friend">Add friend</string>
     <string name="first_and_last_name">First Last</string>
     <string name="about_me">About me</string>
+    <string name="edit_your_profile">Edit your profile</string>
+    <string name="change_your_password">Change your password</string>
+    <string name="log_out">Log out</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 </resources>

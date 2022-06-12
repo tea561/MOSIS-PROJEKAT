@@ -70,16 +70,13 @@
         android:layout_marginLeft="19dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="40dp"
-        android:hint="About me"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewIntro3">
+        android:hint="About me">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputDesc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:inputType="none"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

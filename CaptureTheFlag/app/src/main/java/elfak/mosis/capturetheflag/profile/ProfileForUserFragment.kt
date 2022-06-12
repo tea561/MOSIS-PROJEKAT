@@ -19,7 +19,7 @@ import elfak.mosis.capturetheflag.model.UserViewModel
 import java.lang.Exception
 import java.util.concurrent.Executors
 
-class ProfileFragment : Fragment() {
+class ProfileForUserFragment : Fragment() {
 
     private val userViewModel: UserViewModel by activityViewModels()
 
@@ -33,7 +33,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        return inflater.inflate(R.layout.fragment_profile_for_user, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,5 +72,4 @@ class ProfileFragment : Fragment() {
 
 
     }
-
 }

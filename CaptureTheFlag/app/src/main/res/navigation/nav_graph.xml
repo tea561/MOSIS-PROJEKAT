@@ -104,4 +104,18 @@
 
 
     </fragment>
+
+    <fragment android:id="@+id/ProfileFragment"
+        android:name="elfak.mosis.capturetheflag.profile.ProfileFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_profile">
+
+    </fragment>
+
+    <fragment android:id="@+id/ProfileForUserFragment"
+        android:name="elfak.mosis.capturetheflag.profile.ProfileForUserFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_profile_for_user">
+
+    </fragment>
 </navigation>

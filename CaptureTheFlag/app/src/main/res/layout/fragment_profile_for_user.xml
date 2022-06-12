@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".profile.ProfileForUserFragment"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="427dp"
+        android:layout_height="240dp"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/textViewUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/username_label"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+
+    <TextView
+        android:id="@+id/textViewFirstAndLastName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:text="@string/first_and_last_name"
+        android:textColor="@color/black"
+        android:textSize="34sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputAboutMeProfile"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="373dp"
+        android:layout_height="105dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="19dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="22dp"
+        android:hint="About me">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textInputDesc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonEditYourProfile"
+        android:layout_width="373dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="19dp"
+        android:backgroundTint="#00FFFFFF"
+        android:drawableEnd="@drawable/baseline_navigate_next_24"
+        android:paddingTop="8dp"
+        android:paddingEnd="5dp"
+        android:text="@string/edit_your_profile"
+        android:textAlignment="viewStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonChangePassword"
+        android:layout_width="373dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="19dp"
+        android:backgroundTint="#00FFFFFF"
+        android:drawableEnd="@drawable/baseline_navigate_next_24"
+        android:paddingTop="8dp"
+        android:paddingEnd="5dp"
+        android:text="@string/change_your_password"
+        android:textAlignment="viewStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="22dp" />
+
+    <Button
+        android:id="@+id/buttonLogOut"
+        android:layout_width="105dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="153dp"
+        android:backgroundTint="@color/orange"
+        android:text="@string/log_out"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
