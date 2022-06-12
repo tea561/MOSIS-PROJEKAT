@@ -5,29 +5,30 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
+import androidx.annotation.NonNull
+import androidx.fragment.app.activityViewModels
+import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.databinding.FragmentChangePasswordBinding
+import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
+import elfak.mosis.capturetheflag.model.UserViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ChangePasswordFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChangePasswordFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private var _binding: FragmentChangePasswordBinding? = null
+    private val binding get() = _binding!!
+
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -35,26 +36,54 @@ class ChangePasswordFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_change_password, container, false)
+        _binding = FragmentChangePasswordBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChangePasswordFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ChangePasswordFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val inputOldPassword: EditText = requireView().findViewById(R.id.oldPassword)
+        val inputNewPassword: EditText = requireView().findViewById(R.id.newPassword)
+        val inputConfirmPassword: EditText = requireView().findViewById(R.id.confirmPassword)
+
+        binding.buttonSave.setOnClickListener {
+            val oldPass: String = inputOldPassword.text.toString()
+            val newPass: String = inputNewPassword.text.toString()
+            val confirmPass: String = inputConfirmPassword.text.toString()
+
+            if (oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty())
+                Toast.makeText(view.context, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
+            else{
+                if (newPass != confirmPass){
+                    Toast.makeText(view.context, "Passwords don't match.", Toast.LENGTH_SHORT).show()
+                }
+                else{
+
+                    val email: String = "${userViewModel.selectedUser?.username}@capturetheflag.mosis"
+                    val user = FirebaseAuth.getInstance().currentUser
+                    val credential: AuthCredential = EmailAuthProvider.getCredential(email, oldPass)
+
+                    var returnMessage: String = ""
+                    user?.reauthenticate(credential)?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            user.updatePassword(newPass)
+                                .addOnCompleteListener {
+                                    if(!task.isSuccessful){
+                                        Toast.makeText(view.context, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else {
+                                        Toast.makeText(view.context, "Password successfully changed", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            Toast.makeText(view.context, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+
                 }
             }
+        }
     }
 }

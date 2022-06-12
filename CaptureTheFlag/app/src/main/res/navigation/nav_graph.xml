@@ -16,8 +16,8 @@
             app:destination="@id/SignupFragment" />
 
         <action
-            android:id="@+id/action_LoginFragment_to_MapFragment"
-            app:destination="@id/MapFragment" />
+            android:id="@+id/action_LoginFragment_to_ProfileForUserFragment"
+            app:destination="@id/ProfileForUserFragment" />
     </fragment>
     <fragment
         android:id="@+id/SignupFragment"
@@ -117,5 +117,27 @@
         android:label="@string/profile_fragment_label"
         tools:layout="@layout/fragment_profile_for_user">
 
+        <action
+        android:id="@+id/action_ProfileForUserFragment_to_EditProfileFragment"
+        app:destination="@id/EditProfileFragment" />
+
+        <action
+            android:id="@+id/action_ProfileForUserFragment_to_ChangePasswordFragment"
+            app:destination="@id/ChangePasswordFragment" />
+
     </fragment>
-</navigation>
+
+    <fragment android:id="@+id/EditProfileFragment"
+        android:name="elfak.mosis.capturetheflag.profile.EditProfileFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_edit_profile">
+    </fragment>
+
+    <fragment android:id="@+id/ChangePasswordFragment"
+        android:name="elfak.mosis.capturetheflag.profile.ChangePasswordFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_change_password">
+
+    </fragment>
+
+    </navigation>

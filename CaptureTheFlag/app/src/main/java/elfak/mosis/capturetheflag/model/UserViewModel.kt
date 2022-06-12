@@ -3,9 +3,14 @@ package elfak.mosis.capturetheflag.model
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -107,6 +112,20 @@ class UserViewModel : ViewModel() {
         else {
             val id: String = selectedUser!!.uid
             dbRef.child("users").child(id).child(parameterName).setValue(parameterValue)
+            dbRef.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("TAG", error.message)
+                }
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.hasChild(id)) {
+                        val currentUser = snapshot.child(id).getValue(User::class.java)
+                        currentUser?.uid = id
+                        selectedUser = currentUser
+                    } else {
+                        Log.e("TAG", "Error")
+                    }
+                }
+            })
             return true
         }
         return false

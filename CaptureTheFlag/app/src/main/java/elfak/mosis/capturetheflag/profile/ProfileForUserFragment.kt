@@ -13,14 +13,19 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
+import elfak.mosis.capturetheflag.databinding.FragmentProfileForUserBinding
 import elfak.mosis.capturetheflag.model.UserViewModel
 import java.lang.Exception
 import java.util.concurrent.Executors
 
 class ProfileForUserFragment : Fragment() {
 
+    private var _binding: FragmentProfileForUserBinding? = null
+    private val binding get() = _binding!!
     private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +38,8 @@ class ProfileForUserFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_for_user, container, false)
+        _binding = FragmentProfileForUserBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,8 +49,6 @@ class ProfileForUserFragment : Fragment() {
         val firstAndLastName: TextView = requireView().findViewById<TextView>(R.id.textViewFirstAndLastName)
         val aboutMeDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
 
-        val img = userViewModel.image.value
-        val url = userViewModel.selectedUser?.imgUrl
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -70,6 +74,12 @@ class ProfileForUserFragment : Fragment() {
         firstAndLastName.text = "${userViewModel.selectedUser?.firstName} ${userViewModel.selectedUser?.lastName}"
         aboutMeDesc.setText(userViewModel.selectedUser?.desc)
 
+        binding.buttonEditYourProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_ProfileForUserFragment_to_EditProfileFragment)
+        }
 
+        binding.buttonChangePassword.setOnClickListener {
+            findNavController().navigate(R.id.action_ProfileForUserFragment_to_ChangePasswordFragment)
+        }
     }
 }
