@@ -8,11 +8,24 @@
     tools:context=".profile.EditProfileFragment">
 
 
-    <ImageView
-        android:id="@+id/imageViewProfile"
-        android:layout_width="match_parent"
-        android:layout_height="206dp"
-        tools:src="@tools:sample/avatars" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profilePicView"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        app:cardCornerRadius="120dp"
+        app:cardElevation="36dp">
+
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            tools:src="@tools:sample/avatars" />
+
+    </androidx.cardview.widget.CardView>
 
     <Space
         android:layout_width="match_parent"

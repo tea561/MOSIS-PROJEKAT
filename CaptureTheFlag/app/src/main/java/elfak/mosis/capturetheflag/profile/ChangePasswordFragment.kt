@@ -1,11 +1,16 @@
 package elfak.mosis.capturetheflag.profile
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.activityViewModels
@@ -19,6 +24,8 @@ import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentChangePasswordBinding
 import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
 import elfak.mosis.capturetheflag.model.UserViewModel
+import java.lang.Exception
+import java.util.concurrent.Executors
 
 class ChangePasswordFragment : Fragment() {
 
@@ -43,9 +50,29 @@ class ChangePasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val imageProfile: ImageView = requireView().findViewById(R.id.imageViewProfile)
         val inputOldPassword: EditText = requireView().findViewById(R.id.oldPassword)
         val inputNewPassword: EditText = requireView().findViewById(R.id.newPassword)
         val inputConfirmPassword: EditText = requireView().findViewById(R.id.confirmPassword)
+
+        val executor = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        var image: Bitmap? = null
+
+        executor.execute{
+            val imageUrl = userViewModel.selectedUser?.imgUrl
+            try {
+                val `in` = java.net.URL(imageUrl).openStream()
+                image = BitmapFactory.decodeStream(`in`)
+
+                handler.post{
+                    imageProfile.setImageBitmap(image)
+                }
+            }
+            catch(e: Exception){
+                e.printStackTrace()
+            }
+        }
 
         binding.buttonSave.setOnClickListener {
             val oldPass: String = inputOldPassword.text.toString()
