@@ -17,6 +17,7 @@ import com.google.android.material.navigation.NavigationView
 import elfak.mosis.capturetheflag.databinding.ActivityMainBinding
 import elfak.mosis.capturetheflag.game.map.LocationService
 import elfak.mosis.capturetheflag.model.MainViewModel
+import elfak.mosis.capturetheflag.model.UserViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.ProfileForUserFragment, R.id.EditProfileFragment), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.ProfileForUserFragment, R.id.HomeFragment, R.id.MapFragment), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 

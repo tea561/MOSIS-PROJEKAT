@@ -99,6 +99,15 @@
     </fragment>
 
     <fragment
+        android:id="@+id/HomeFragment"
+        android:name="elfak.mosis.capturetheflag.common.HomeFragment"
+        android:label="@string/home_fragment_label"
+        tools:layout="@layout/fragment_home">
+
+
+    </fragment>
+
+    <fragment
         android:id="@+id/MapFragment"
         android:name="elfak.mosis.capturetheflag.game.map.MapFragment"
         android:label="@string/map_fragment_label"
