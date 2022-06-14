@@ -1,11 +1,15 @@
 package elfak.mosis.capturetheflag.game.map
 
+import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -34,7 +38,9 @@ class MapFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_map, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,6 +72,8 @@ class MapFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -80,12 +88,26 @@ class MapFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         map.onResume()
+        if(!checkLocationServiceRunning()) {
+            val locationServiceIntent = Intent(this.context, LocationService().javaClass)
+            requireActivity().startService(locationServiceIntent)
+        }
     }
 
     private fun setMyLocationOverlay() {
         val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(activity), map)
         myLocationOverlay.enableMyLocation()
         map.overlays.add(myLocationOverlay)
+    }
+
+    private fun checkLocationServiceRunning(): Boolean {
+        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+            if (LocationService::class.simpleName == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
 }

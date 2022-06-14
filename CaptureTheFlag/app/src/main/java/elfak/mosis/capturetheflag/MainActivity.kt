@@ -1,5 +1,6 @@
 package elfak.mosis.capturetheflag
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -9,15 +10,19 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import elfak.mosis.capturetheflag.databinding.ActivityMainBinding
+import elfak.mosis.capturetheflag.game.map.LocationService
+import elfak.mosis.capturetheflag.model.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,5 +71,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!mainViewModel.keepLocationServiceAlive) {
+            stopService(Intent(this, LocationService().javaClass))
+        }
     }
 }
