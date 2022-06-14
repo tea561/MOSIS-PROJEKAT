@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
@@ -30,7 +32,8 @@ class ProfileForUserFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        //val toolbar: androidx.appcompat.widget.Toolbar = activity?.findViewById(R.id.toolbar)!!
+        //(activity as AppCompatActivity).setSupportActionBar(toolbar)
     }
 
     override fun onCreateView(
@@ -44,6 +47,7 @@ class ProfileForUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val imageProfile: ImageView = requireView().findViewById<ImageView>(R.id.imageProfile)
         val username: TextView = requireView().findViewById<TextView>(R.id.textViewUsername)
         val firstAndLastName: TextView = requireView().findViewById<TextView>(R.id.textViewFirstAndLastName)
@@ -81,5 +85,10 @@ class ProfileForUserFragment : Fragment() {
         binding.buttonChangePassword.setOnClickListener {
             findNavController().navigate(R.id.action_ProfileForUserFragment_to_ChangePasswordFragment)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
     }
 }

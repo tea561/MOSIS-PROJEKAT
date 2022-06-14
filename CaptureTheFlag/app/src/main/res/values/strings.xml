@@ -20,6 +20,10 @@
     <string name="login_button">Log In</string>
     <string name="create_acc_button">Create now</string>
     <string name="no_acc_label">Don\'t have account?</string>
+    <string name="home_label">Home</string>
+    <string name="notifications_label">Notifications</string>
+    <string name="rankings_label">Rankings</string>
+    <string name="friends_label">Friends</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="welcome">Welcome To Capture The Flag</string>
