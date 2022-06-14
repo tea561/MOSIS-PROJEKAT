@@ -4,16 +4,16 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.model.UserViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -24,6 +24,7 @@ class MapFragment : Fragment() {
 
     private lateinit var mapViewModel: MapViewModel
     private lateinit var map: MapView
+    private val userViewModel: UserViewModel by activityViewModels()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -70,10 +71,9 @@ class MapFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        mapViewModel = ViewModelProvider(this,
+            MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -90,12 +90,14 @@ class MapFragment : Fragment() {
         map.onResume()
         if(!checkLocationServiceRunning()) {
             val locationServiceIntent = Intent(this.context, LocationService().javaClass)
+                .putExtra("userID", userViewModel.selectedUser!!.uid)
             requireActivity().startService(locationServiceIntent)
         }
     }
 
     private fun setMyLocationOverlay() {
         val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(activity), map)
+
         myLocationOverlay.enableMyLocation()
         map.overlays.add(myLocationOverlay)
     }
