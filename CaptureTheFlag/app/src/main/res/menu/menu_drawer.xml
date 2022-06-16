@@ -30,7 +30,7 @@
             android:title="@string/rankings_label"></item>
 
         <item
-            android:id="@+id/friends"
+            android:id="@+id/BluetoothFragment"
             android:icon="@drawable/baseline_people_black_24"
             app:iconTint="@color/blue"
             android:title="@string/friends_label"></item>

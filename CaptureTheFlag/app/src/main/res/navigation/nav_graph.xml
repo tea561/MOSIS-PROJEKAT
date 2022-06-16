@@ -151,4 +151,11 @@
 
     </fragment>
 
+    <fragment android:id="@+id/BluetoothFragment"
+        android:name="elfak.mosis.capturetheflag.friends.BluetoothClientFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_bluetooth">
+
+    </fragment>
+
     </navigation>

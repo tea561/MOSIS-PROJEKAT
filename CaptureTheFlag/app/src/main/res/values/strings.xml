@@ -49,5 +49,6 @@
     <string name="log_out">Log out</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="scan">Scan</string>
 
 </resources>
