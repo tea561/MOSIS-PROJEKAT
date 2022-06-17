@@ -12,9 +12,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 
-class MapViewModel(app: Application, var uid: String) : ViewModel() {
+class MapViewModel(app: Application, var uid: String) : ViewModel(), IMyLocationConsumer {
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
@@ -23,6 +26,14 @@ class MapViewModel(app: Application, var uid: String) : ViewModel() {
     var userLocation: LiveData<Location> = _userLocation
 
     init {
+        //subscribeToLocationInDB()
+    }
+
+    fun setLocation(location: GeoPoint) {
+        dbRef.child("locations").child(uid).setValue(location)
+    }
+
+    fun subscribeToLocationInDB() {
         dbRef.child("locations").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
                 Log.e("MAP", error.message)
@@ -33,9 +44,15 @@ class MapViewModel(app: Application, var uid: String) : ViewModel() {
                     Log.i("MAPS", "Location: ${location!!.latitude}, ${location.longitude}")
                 } else {
                     Log.e("MAPS", "Location unavailable.")
+                    dbRef.child("locations").child(uid).setValue("")
                 }
             }
         })
+    }
+
+    override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
+        //TODO: write location to DB
+        Log.i("MAPS", "LOKACIJAAAAAAAAAAAA")
     }
 }
 

@@ -1,10 +1,15 @@
 package elfak.mosis.capturetheflag.game.map
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
-import android.content.Intent
+import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -20,7 +25,8 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-class MapFragment : Fragment() {
+
+class MapFragment : Fragment(), LocationListener {
 
     private lateinit var mapViewModel: MapViewModel
     private lateinit var map: MapView
@@ -88,17 +94,26 @@ class MapFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         map.onResume()
-        if(!checkLocationServiceRunning()) {
+        /*if(!checkLocationServiceRunning()) {
             val locationServiceIntent = Intent(this.context, LocationService().javaClass)
                 .putExtra("userID", userViewModel.selectedUser!!.uid)
             requireActivity().startService(locationServiceIntent)
-        }
+        }*/
     }
 
+    @SuppressLint("MissingPermission")
     private fun setMyLocationOverlay() {
-        val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(activity), map)
+        val mLocationManager = requireContext().getSystemService(LOCATION_SERVICE) as LocationManager
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, Float.MIN_VALUE, this)
+        val locationProvider = GpsMyLocationProvider(activity)
+        locationProvider.locationUpdateMinTime = 1000
 
+        val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
+        locationProvider.startLocationProvider(mapViewModel)
         myLocationOverlay.enableMyLocation()
+        myLocationOverlay.enableFollowLocation()
+        //mapViewModel.setLocation(myLocationOverlay.myLocation)
+        //mapViewModel.subscribeToLocationInDB()
         map.overlays.add(myLocationOverlay)
     }
 
@@ -110,6 +125,15 @@ class MapFragment : Fragment() {
             }
         }
         return false
+    }
+
+    override fun onLocationChanged(location: Location) {
+        Log.i("MapFragment", "onLocChanged!!!!!!!!!!!!!")
+        //TODO: change location in VM
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        Log.i("MapFragment", "onStatusChanged")
     }
 
 }
