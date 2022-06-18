@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.model.UserViewModel
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -46,9 +48,14 @@ class MapFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        val prefs = PreferenceHelper.customPreference(requireContext(), "User_data")
+        prefs.userId = userViewModel.selectedUser!!.uid
+        if(!checkLocationServiceRunning()) {
+            val locationServiceIntent = Intent(this.context, LocationService().javaClass)
+                .putExtra("userID", userViewModel.selectedUser!!.uid)
+            requireActivity().startService(locationServiceIntent)
+        }
         return inflater.inflate(R.layout.fragment_map, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,6 +88,7 @@ class MapFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         mapViewModel = ViewModelProvider(this,
             MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
@@ -98,11 +106,7 @@ class MapFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         map.onResume()
-        if(!checkLocationServiceRunning()) {
-            val locationServiceIntent = Intent(this.context, LocationService().javaClass)
-                .putExtra("userID", userViewModel.selectedUser!!.uid)
-            requireActivity().startService(locationServiceIntent)
-        }
+
     }
 
     @SuppressLint("MissingPermission")
