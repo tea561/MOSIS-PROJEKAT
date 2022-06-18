@@ -35,8 +35,8 @@
             android:name=".game.map.LocationService"
             android:enabled="true"
             android:exported="true"
-            >
-        </service>
+            android:foregroundServiceType="location"
+        />
 
         <activity
             android:name=".MainActivity"

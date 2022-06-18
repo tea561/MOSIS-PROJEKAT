@@ -39,6 +39,9 @@ class Intro1Fragment : Fragment() {
         binding.buttonNext.setOnClickListener{
             findNavController().navigate(R.id.action_Intro1Fragment_to_Intro2Fragment)
         }
+        binding.buttonSkip.setOnClickListener{
+            findNavController().navigate(R.id.action_Intro1Fragment_to_Intro2Fragment)
+        }
     }
 
     override fun onResume() {

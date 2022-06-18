@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.LOCATION_SERVICE
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -26,7 +27,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
-class MapFragment : Fragment(), LocationListener {
+class MapFragment : Fragment() {
 
     private lateinit var mapViewModel: MapViewModel
     private lateinit var map: MapView
@@ -61,6 +62,9 @@ class MapFragment : Fragment(), LocationListener {
             != PackageManager.PERMISSION_DENIED
             && ActivityCompat.checkSelfPermission(
                 requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
@@ -94,46 +98,32 @@ class MapFragment : Fragment(), LocationListener {
     override fun onResume() {
         super.onResume()
         map.onResume()
-        /*if(!checkLocationServiceRunning()) {
+        if(!checkLocationServiceRunning()) {
             val locationServiceIntent = Intent(this.context, LocationService().javaClass)
                 .putExtra("userID", userViewModel.selectedUser!!.uid)
             requireActivity().startService(locationServiceIntent)
-        }*/
+        }
     }
 
     @SuppressLint("MissingPermission")
     private fun setMyLocationOverlay() {
-        val mLocationManager = requireContext().getSystemService(LOCATION_SERVICE) as LocationManager
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, Float.MIN_VALUE, this)
         val locationProvider = GpsMyLocationProvider(activity)
-        locationProvider.locationUpdateMinTime = 1000
-
         val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
-        locationProvider.startLocationProvider(mapViewModel)
         myLocationOverlay.enableMyLocation()
         myLocationOverlay.enableFollowLocation()
-        //mapViewModel.setLocation(myLocationOverlay.myLocation)
-        //mapViewModel.subscribeToLocationInDB()
         map.overlays.add(myLocationOverlay)
     }
 
     private fun checkLocationServiceRunning(): Boolean {
         val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        //FIXME: fix service starting while already running
         for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
             if (LocationService::class.simpleName == service.service.className) {
                 return true
             }
         }
         return false
-    }
 
-    override fun onLocationChanged(location: Location) {
-        Log.i("MapFragment", "onLocChanged!!!!!!!!!!!!!")
-        //TODO: change location in VM
     }
-
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        Log.i("MapFragment", "onStatusChanged")
-    }
-
 }
