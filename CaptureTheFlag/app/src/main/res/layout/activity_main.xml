@@ -9,9 +9,7 @@
     tools:openDrawer="start">
 
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -45,7 +43,7 @@
         app:backgroundTint="@color/gray_dark"
         app:fabSize="mini"
         app:rippleColor="@color/blue"
-        app:srcCompat="@android:drawable/ic_menu_edit"
+        app:srcCompat="@drawable/sharp_edit_24"
         app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
