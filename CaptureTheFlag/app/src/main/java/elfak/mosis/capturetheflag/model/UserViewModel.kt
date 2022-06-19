@@ -1,6 +1,7 @@
 package elfak.mosis.capturetheflag.model
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
@@ -13,6 +14,7 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -20,6 +22,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
+import kotlinx.coroutines.selects.select
 import java.io.ByteArrayOutputStream
 
 class UserViewModel : ViewModel() {
@@ -157,6 +160,42 @@ class UserViewModel : ViewModel() {
                 _uploadState.value =
                     StoreUploadState.Success("Upload successful with image URL: $photoUrl")
             }
+        }
+    }
+
+    fun addFriend(friendUid: String){
+        val key = dbRef.child("users").push().key
+        if (key == null) {
+            Log.w(ContentValues.TAG, "Couldn't get push key for posts")
+        }
+        else {
+            val id = selectedUser!!.uid
+            dbRef.child("users").child(id).child("friends").child(friendUid).setValue(true)
+            val childEventListener = object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val friend: String = snapshot.key ?: ""
+                    if(friend != "" && !(selectedUser!!.friends.containsKey(friend)))
+                        selectedUser!!.friends[friend] = true
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(TAG, "postComments:onCancelled", error.toException())
+                }
+            }
+            dbRef.child("users").child(id).child("friends").addChildEventListener(childEventListener)
+
         }
     }
 

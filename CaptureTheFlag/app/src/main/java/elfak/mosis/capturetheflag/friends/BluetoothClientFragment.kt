@@ -14,15 +14,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.model.UserViewModel
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.*
 
 
@@ -31,7 +32,8 @@ class BluetoothClientFragment : Fragment() {
     private val REQUEST_ENABLE_BT = 1
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private lateinit var bluetoothDevices: MutableList<BluetoothDevice>
-    private lateinit var listAdapter: ArrayAdapter<String>
+    private lateinit var listAdapter: ArrayAdapter<BluetoothDevice>
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,79 +52,46 @@ class BluetoothClientFragment : Fragment() {
         return view
     }
 
+    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         val buttonScan: Button = requireView().findViewById(R.id.buttonScan)
         val pairedDevicesList: ListView = requireView().findViewById(R.id.listViewPairedDevices)
-        listAdapter = ArrayAdapter<String>(view.context, android.R.layout.simple_list_item_1)
+        listAdapter = ArrayAdapter<BluetoothDevice>(view.context, android.R.layout.simple_list_item_1)
         pairedDevicesList.adapter = listAdapter
+        pairedDevicesList.onItemClickListener =
+            AdapterView.OnItemClickListener { p0, p1, p2, p3 -> TODO("Not yet implemented") }
 
-        checkBTState()
+
 
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
         activity?.registerReceiver(receiver,filter)
 
         buttonScan.setOnClickListener {
             if(bluetoothAdapter != null && bluetoothAdapter.isEnabled){
-                val permission: String = requiredPermissions()[0]
-                if (ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        permission
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(requireActivity(), requiredPermissions(), 1)
-                    return@setOnClickListener
-                }
+//                val pairedDevices = bluetoothAdapter.bondedDevices
+//                pairedDevices?.forEach { device ->
+//                    val deviceName = device.name
+//                    val deviceHardwareAddress = device.address // MAC address
+//                    bluetoothDevices.add(device)
+//                }
+                bluetoothDevices.clear()
                 listAdapter.clear()
                 bluetoothAdapter.startDiscovery()
+
+                val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+                activity?.registerReceiver(receiver,filter)
             }
             else
             {
-                checkBTState()
+                Log.e("BluetoothClient", "Bluetooth disabled")
             }
         }
     }
 
-    private fun checkBTState(){
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-            Toast.makeText(requireContext(), "Device doesn't support Bluetooth", Toast.LENGTH_SHORT).show()
-        }
-        else {
-            if (!bluetoothAdapter?.isEnabled) {
-                Toast.makeText(requireContext(), "You need to enable Bluetooth.", Toast.LENGTH_SHORT)
-                    .show()
-                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                try {
-                    activity?.startActivityFromFragment(this, enableBtIntent, REQUEST_ENABLE_BT)
-                } catch (e: ActivityNotFoundException) {
-                    // display error state to the user
-                }
-            } else {
-                val permission: String = requiredPermissions()[0]
-                if (ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        permission
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(requireActivity(), requiredPermissions(), 1)
-                    return
-                }
-                if (bluetoothAdapter.isDiscovering) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Device discovering process...",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(requireContext(), "Bluetooth enabled.", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-            }
-        }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -130,23 +99,6 @@ class BluetoothClientFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun pairedDeviceList()
-    {
-        val pairedDevices = bluetoothAdapter.bondedDevices
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            val deviceHardwareAddress = device.address // MAC address
-            bluetoothDevices.add(device)
-        }
-
-        bluetoothAdapter!!.startDiscovery()
-
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        activity?.registerReceiver(receiver,filter)
-
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -160,7 +112,7 @@ class BluetoothClientFragment : Fragment() {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)!!
                     val deviceName = device.name
                     val deviceHardwareAddress = device.address // MAC address
-                    listAdapter.add("$deviceName $deviceHardwareAddress")
+                    listAdapter.add(device)
                     listAdapter.notifyDataSetChanged()
                     bluetoothDevices.add(device)
                 }
@@ -168,28 +120,11 @@ class BluetoothClientFragment : Fragment() {
         }
     }
 
-    private fun requiredPermissions(): Array<String>{
-        val sdkVersion: Int = requireActivity().applicationInfo.targetSdkVersion
-        //android 12
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sdkVersion >= Build.VERSION_CODES.S) {
-            arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE)
-        }
-        //android 9 and lower
-        else if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && sdkVersion <= Build.VERSION_CODES.P){
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
-        } else {
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(requireContext(), "Bluetooth enabled.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
+    @SuppressLint("MissingPermission")
     override fun onDestroy() {
         activity?.unregisterReceiver(receiver)
+        bluetoothAdapter.cancelDiscovery()
         super.onDestroy()
 
     }
@@ -218,7 +153,8 @@ class BluetoothClientFragment : Fragment() {
         }
 
         private fun manageMyConnectedSocket(socket: BluetoothSocket) {
-            TODO("Not yet implemented")
+            val connectionThread: ConnectedThread = ConnectedThread(socket)
+            connectionThread.start()
         }
 
         // Closes the client socket and causes the thread to finish.
@@ -228,6 +164,50 @@ class BluetoothClientFragment : Fragment() {
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the client socket", e)
             }
+        }
+
+        private inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread()
+        {
+            private val mmInStream: InputStream = mmSocket.inputStream
+            private val mmOutStream: OutputStream = mmSocket.outputStream
+            private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
+
+
+            override fun run() {
+                var numBytes: Int // bytes returned from read()
+                val uid: String = userViewModel.selectedUser?.uid ?: ""
+
+                //send uid
+                try{
+                    mmOutStream.write(uid.toByteArray())
+                } catch (e: IOException){
+                    Log.e(TAG, "Error occurred when sending data", e)
+                }
+
+                // Keep listening to the InputStream until an exception occurs.
+                while (true) {
+                    // Read from the InputStream.
+                    numBytes = try {
+                        mmInStream.read(mmBuffer)
+                    } catch (e: IOException) {
+                        Log.d(TAG, "Input stream was disconnected", e)
+                        break
+                    }
+
+                    //TODO: izlaz iz petlje i close connection
+
+
+                }
+            }
+
+            fun cancel() {
+                try{
+                    mmSocket.close()
+                } catch (e: IOException){
+                    Log.e(TAG, "Could not close the connect socket", e)
+                }
+            }
+
         }
     }
 

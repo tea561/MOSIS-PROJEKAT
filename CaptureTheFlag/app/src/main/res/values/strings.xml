@@ -50,5 +50,6 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="scan">Scan</string>
+    <string name="let_your_friends_discover_you">Let your friends find you</string>
 
 </resources>

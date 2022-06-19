@@ -81,7 +81,7 @@ class LoginFragment : Fragment() {
         val authStateObserver = Observer<AuthState> { state ->
             if (state == AuthState.Success) {
                 Toast.makeText(view.context, "User logged in! Welcome, ${userViewModel.selectedUser!!.username}", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_LoginFragment_to_MapFragment)
+                findNavController().navigate(R.id.action_LoginFragment_to_ProfileForUserFragment)
             }
             if (state is AuthState.AuthError) {
                 Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
