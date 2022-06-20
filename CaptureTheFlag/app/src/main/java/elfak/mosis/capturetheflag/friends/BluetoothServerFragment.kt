@@ -95,7 +95,8 @@ class BluetoothServerFragment : Fragment() {
         }
 
         private fun manageMyConnectedSocket(it: BluetoothSocket) {
-            TODO("Not yet implemented")
+            val connectionThread: ConnectedThread = ConnectedThread(it)
+            connectionThread.start()
         }
 
         // Closes the connect socket and causes the thread to finish.
@@ -115,8 +116,9 @@ class BluetoothServerFragment : Fragment() {
 
             override fun run() {
                 var numBytes: Int // bytes returned from read()
-                var friendUid: String
+                var friendUid: String = ""
                 val currentUserUid: String = userViewModel.selectedUser?.uid ?: ""
+                val end: String = "end"
 
                 // Keep listening to the InputStream until an exception occurs.
                 while (true) {
@@ -134,10 +136,16 @@ class BluetoothServerFragment : Fragment() {
                     }
                 }
 
+                try{
+                    mmOutStream.write(currentUserUid.toByteArray())
+                    mmOutStream.write(end.toByteArray())
+                }
+                catch (e: IOException){
+                    Log.e(ContentValues.TAG, "Error occurred when sending data", e)
+                }
 
-
-
-
+                mmSocket.close()
+                userViewModel.addFriend(friendUid)
             }
 
 

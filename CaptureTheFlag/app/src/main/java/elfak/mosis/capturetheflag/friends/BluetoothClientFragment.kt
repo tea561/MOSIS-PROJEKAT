@@ -1,21 +1,21 @@
 package elfak.mosis.capturetheflag.friends
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.bluetooth.*
-import android.content.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
+import android.content.BroadcastReceiver
 import android.content.ContentValues.TAG
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.os.Build
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -62,9 +62,14 @@ class BluetoothClientFragment : Fragment() {
         val pairedDevicesList: ListView = requireView().findViewById(R.id.listViewPairedDevices)
         listAdapter = ArrayAdapter<BluetoothDevice>(view.context, android.R.layout.simple_list_item_1)
         pairedDevicesList.adapter = listAdapter
-        pairedDevicesList.onItemClickListener =
-            AdapterView.OnItemClickListener { p0, p1, p2, p3 -> TODO("Not yet implemented") }
-
+        pairedDevicesList.setOnItemClickListener(object: AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                var BTDevice: BluetoothDevice = p0?.adapter?.getItem(p2) as BluetoothDevice
+                Toast.makeText(view.context, BTDevice.toString(), Toast.LENGTH_SHORT).show()
+                val connectThread = ConnectThread(BTDevice)
+                connectThread.start()
+            }
+        })
 
 
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -137,7 +142,7 @@ class BluetoothClientFragment : Fragment() {
             device.createRfcommSocketToServiceRecord(UUID.fromString("505961ad-0e61-4de4-a0d9-313c06572d09"))
         }
 
-        public override fun run() {
+        override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
             bluetoothAdapter?.cancelDiscovery()
 
@@ -153,7 +158,7 @@ class BluetoothClientFragment : Fragment() {
         }
 
         private fun manageMyConnectedSocket(socket: BluetoothSocket) {
-            val connectionThread: ConnectedThread = ConnectedThread(socket)
+            val connectionThread = ConnectedThread(socket)
             connectionThread.start()
         }
 
@@ -175,6 +180,7 @@ class BluetoothClientFragment : Fragment() {
 
             override fun run() {
                 var numBytes: Int // bytes returned from read()
+                var friendUid = ""
                 val uid: String = userViewModel.selectedUser?.uid ?: ""
 
                 //send uid
@@ -194,10 +200,15 @@ class BluetoothClientFragment : Fragment() {
                         break
                     }
 
-                    //TODO: izlaz iz petlje i close connection
-
-
+                    if(String(mmBuffer) != "end")
+                        friendUid = String(mmBuffer)
+                    else
+                        break
                 }
+
+                mmSocket.close()
+                userViewModel.addFriend(friendUid)
+
             }
 
             fun cancel() {

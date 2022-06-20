@@ -50,7 +50,9 @@
             android:id="@+id/textInputDesc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:inputType="none" />
+            android:enabled="false"
+            android:inputType="none"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

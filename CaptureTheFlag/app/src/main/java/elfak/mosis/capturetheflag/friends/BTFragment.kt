@@ -56,7 +56,7 @@ class BTFragment : Fragment() {
                 checkBTState()
             }
             else {
-                //TODO: preci na BTClient
+                findNavController().navigate(R.id.action_BTFragment_to_BluetoothClientFragment)
             }
         }
 
@@ -66,7 +66,7 @@ class BTFragment : Fragment() {
                 checkBTState()
             }
             else {
-                //TODO: preci na BTServer
+                findNavController().navigate(R.id.action_BTFragment_to_BluetoothServerFragment)
             }
         }
     }

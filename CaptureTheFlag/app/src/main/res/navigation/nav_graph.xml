@@ -151,11 +151,34 @@
 
     </fragment>
 
-    <fragment android:id="@+id/BluetoothFragment"
-        android:name="elfak.mosis.capturetheflag.friends.BluetoothClientFragment"
+    <fragment android:id="@+id/BTFragment"
+        android:name="elfak.mosis.capturetheflag.friends.BTFragment"
         android:label="@string/profile_fragment_label"
         tools:layout="@layout/fragment_bluetooth">
 
+        <action
+            android:id="@+id/action_BTFragment_to_BluetoothClientFragment"
+            app:destination="@id/BluetoothClientFragment" />
+
+        <action
+            android:id="@+id/action_BTFragment_to_BluetoothServerFragment"
+            app:destination="@id/BluetoothServerFragment" />
+
     </fragment>
+
+    <fragment android:id="@+id/BluetoothServerFragment"
+        android:name="elfak.mosis.capturetheflag.friends.BluetoothServerFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_bluetooth_server">
+
+    </fragment>
+
+    <fragment android:id="@+id/BluetoothClientFragment"
+        android:name="elfak.mosis.capturetheflag.friends.BluetoothClientFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_b_t">
+
+    </fragment>
+
 
     </navigation>
