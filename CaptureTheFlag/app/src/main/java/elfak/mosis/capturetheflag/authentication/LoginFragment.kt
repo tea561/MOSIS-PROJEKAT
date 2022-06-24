@@ -1,18 +1,21 @@
 package elfak.mosis.capturetheflag.authentication
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,6 +27,8 @@ import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 import elfak.mosis.capturetheflag.model.AuthState
 import elfak.mosis.capturetheflag.model.UserViewModel
+import java.lang.Exception
+import java.util.concurrent.Executors
 
 
 /**
@@ -81,6 +86,37 @@ class LoginFragment : Fragment() {
         val authStateObserver = Observer<AuthState> { state ->
             if (state == AuthState.Success) {
                 Toast.makeText(view.context, "User logged in! Welcome, ${userViewModel.selectedUser!!.username}", Toast.LENGTH_SHORT).show()
+
+                val navView: NavigationView? = activity?.findViewById(R.id.nav_view) ?: null
+
+                if(navView != null) {
+                    val headerView: View = navView.getHeaderView(0)
+                    val usernameHeader: TextView = headerView.findViewById(R.id.textViewUsername)
+                    val nameHeader: TextView = headerView.findViewById(R.id.textViewName)
+                    val headerImgProfile: ImageView = headerView.findViewById(R.id.imageViewProfile)
+                    usernameHeader.text = userViewModel.selectedUser!!.username
+                    nameHeader.text = "${userViewModel.selectedUser!!.firstName} ${userViewModel.selectedUser!!.lastName}"
+
+                    val executor = Executors.newSingleThreadExecutor()
+                    val handler = Handler(Looper.getMainLooper())
+                    var image: Bitmap? = null
+
+                    executor.execute{
+                        val imageUrl = userViewModel.selectedUser?.imgUrl
+                        try {
+                            val `in` = java.net.URL(imageUrl).openStream()
+                            image = BitmapFactory.decodeStream(`in`)
+
+                            handler.post{
+                                headerImgProfile.setImageBitmap(image)
+                            }
+                        }
+                        catch(e: Exception){
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
                 findNavController().navigate(R.id.action_LoginFragment_to_MapFragment)
             }
             if (state is AuthState.AuthError) {

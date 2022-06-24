@@ -2,6 +2,7 @@ package elfak.mosis.capturetheflag.profile
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +17,8 @@ import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.viewbinding.ViewBindings
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
@@ -32,6 +35,7 @@ class ProfileForUserFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         //val toolbar: androidx.appcompat.widget.Toolbar = activity?.findViewById(R.id.toolbar)!!
         //(activity as AppCompatActivity).setSupportActionBar(toolbar)
     }
