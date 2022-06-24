@@ -93,7 +93,7 @@ class BTFragment : Fragment() {
             Toast.makeText(requireContext(), "Device doesn't support Bluetooth", Toast.LENGTH_SHORT).show()
         }
         else {
-            if (!bluetoothAdapter?.isEnabled) {
+            if (!bluetoothAdapter.isEnabled) {
                 Toast.makeText(requireContext(), "You need to enable Bluetooth.", Toast.LENGTH_SHORT)
                     .show()
                 val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
