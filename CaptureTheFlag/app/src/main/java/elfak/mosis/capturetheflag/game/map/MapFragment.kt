@@ -12,12 +12,15 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
@@ -60,6 +63,39 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener { view ->
+            val dialog = BottomSheetDialog(requireContext())
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
+            val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
+            btnBarrier.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into barrier marker positioning state
+                dialog.dismiss()
+            }
+
+            val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
+            btnEnemyBarrier.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into enemy barrier marker positioning state
+                dialog.dismiss()
+            }
+
+            val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
+            btnEnemyFlag.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into enemy flag marker positioning state
+                dialog.dismiss()
+            }
+            dialog.setCancelable(true)
+            dialog.setContentView(view)
+            dialog.show()
+        }
+
+
+
+
         val ctx: Context? = activity?.applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
         map = requireView().findViewById(R.id.map)
@@ -92,6 +128,8 @@ class MapFragment : Fragment() {
         mapViewModel = ViewModelProvider(this,
             MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

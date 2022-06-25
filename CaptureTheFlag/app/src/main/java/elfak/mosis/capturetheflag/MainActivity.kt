@@ -42,42 +42,39 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        binding.fab.setOnClickListener { view ->
-
+        /*binding.fab.setOnClickListener { view ->
             val dialog = BottomSheetDialog(this)
-
-            // on below line we are inflating a layout file which we have created.
             val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
-
-            // on below line we are creating a variable for our button
-            // which we are using to dismiss our dialog.
-            /*val btnClose = view.findViewById<Button>(R.id.idBtnDismiss)
-
-            // on below line we are adding on click listener
-            // for our dismissing the dialog button.
-            btnClose.setOnClickListener {
-                // on below line we are calling a dismiss
-                // method to close our dialog.
+            val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
+            btnBarrier.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into barrier marker positioning state
                 dialog.dismiss()
-            }*/
-            // below line is use to set cancelable to avoid
-            // closing of dialog box when clicking on the screen.
+            }
+
+            val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
+            btnEnemyBarrier.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into enemy barrier marker positioning state
+                dialog.dismiss()
+            }
+
+            val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
+            btnEnemyFlag.setOnClickListener {
+                //TODO: pull out bottom_sheet_set_marker
+                //TODO: put game into enemy flag marker positioning state
+                dialog.dismiss()
+            }
             dialog.setCancelable(true)
-
-            // on below line we are setting
-            // content view to our view.
             dialog.setContentView(view)
-
-            // on below line we are calling
-            // a show method to display a dialog.
             dialog.show()
-        }
+        }*/
         binding.fab.hide()
 
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        /*navController.addOnDestinationChangedListener { controller, destination, arguments ->
             if ( destination.id == R.id.MapFragment)
                 binding.fab.show()
-        }
+        }*/
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

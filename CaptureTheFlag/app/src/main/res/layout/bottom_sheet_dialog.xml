@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="@color/gray_dark">
@@ -10,28 +11,19 @@
         android:layout_height="wrap_content"
         android:layout_margin="2dp">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Actions"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@color/white" />
-
         <Button
             android:id="@+id/btnBarrier"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/title"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:text="Add Team Barrier"
             android:textAllCaps="false"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:icon="@drawable/ic_road_barrier_solid" />
 
         <Button
             android:id="@+id/btnEnemyBarrier"
@@ -45,7 +37,8 @@
             android:layout_marginBottom="10dp"
             android:text="Add Enemy Barrier Marker"
             android:textAllCaps="false"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:icon="@drawable/ic_burst_solid" />
 
         <Button
             android:id="@+id/btnEnemyFlag"
@@ -59,7 +52,8 @@
             android:layout_marginBottom="10dp"
             android:text="Add Enemy Flag Marker"
             android:textAllCaps="false"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:icon="@drawable/ic_location_crosshairs_solid" />
 
         <!--<Button
             android:id="@+id/idBtnDismiss"
