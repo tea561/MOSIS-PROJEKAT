@@ -70,23 +70,17 @@ class MapFragment : Fragment() {
             val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
             val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
             btnBarrier.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into barrier marker positioning state
-                dialog.dismiss()
+                openSetMarkerBottomSheet(dialog, "PlaceBarrier");
             }
 
             val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
             btnEnemyBarrier.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into enemy barrier marker positioning state
-                dialog.dismiss()
+                openSetMarkerBottomSheet(dialog, "PlaceEnemyBarrier");
             }
 
             val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
             btnEnemyFlag.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into enemy flag marker positioning state
-                dialog.dismiss()
+                openSetMarkerBottomSheet(dialog, "PlaceEnemyFlag");
             }
             dialog.setCancelable(true)
             dialog.setContentView(view)
@@ -167,5 +161,16 @@ class MapFragment : Fragment() {
         }
         return false
 
+    }
+
+    private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, state: String) {
+        //TODO: pull out bottom_sheet_set_marker
+        //TODO: put game into barrier marker positioning state
+        Log.d("MAP Set Marker", "State: $state");
+        dialog.dismiss()
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_set_marker, null)
+        dialog.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.show()
     }
 }
