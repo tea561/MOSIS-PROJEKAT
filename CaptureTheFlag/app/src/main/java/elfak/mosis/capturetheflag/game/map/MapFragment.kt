@@ -28,6 +28,7 @@ import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -111,8 +112,9 @@ class MapFragment : Fragment() {
 
         map.setMultiTouchControls(true)
         map.controller.setZoom(20.0)
-        map.controller.setCenter(GeoPoint(43.3209, 21.8958))
-
+//        map.controller.setCenter(GeoPoint(43.3209, 21.8958))
+        val mapEventsOverlay = MapEventsOverlay(mapViewModel)
+        map.overlays.add(mapEventsOverlay)
 
     }
 

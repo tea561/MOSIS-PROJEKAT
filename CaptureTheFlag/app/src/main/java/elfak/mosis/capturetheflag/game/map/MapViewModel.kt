@@ -14,18 +14,22 @@ import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 
-class MapViewModel(app: Application, var uid: String) : ViewModel() {
+class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsReceiver {
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
     private var _userLocation = MutableLiveData<Location>()
     var userLocation: LiveData<Location> = _userLocation
+
+    private var _mapState = MutableLiveData<MapState>()
+    var mapState: LiveData<MapState> = _mapState
 
     init {
         subscribeToLocationInDB()
@@ -65,6 +69,17 @@ class MapViewModel(app: Application, var uid: String) : ViewModel() {
         })
 
     }
+
+    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+        Log.d("singleTapConfirmedHelper", "${p?.latitude} - ${p?.longitude}")
+        //TODO: proveriti stanje mape i handleovati event na pravi nacin
+        return true
+    }
+
+    override fun longPressHelper(p: GeoPoint?): Boolean {
+        Log.d("longPressHelper", "${p?.latitude} - ${p?.longitude}")
+        return false
+    }
 }
 
 class MapViewModelFactory(private val app: Application, private val uid: String) :
@@ -76,4 +91,13 @@ class MapViewModelFactory(private val app: Application, private val uid: String)
 
 class FirebaseLocation: Location(LocationManager.GPS_PROVIDER) {
 
+}
+
+sealed class MapState {
+    object PlacingFlag : MapState()
+    object PlacingBarrier : MapState()
+    object PlacingEnemyBarrier : MapState()
+    object PlacingEnemyFlag : MapState()
+    object Idle: MapState()
+    //class UploadError(val message: String? = null) : StoreUploadState()
 }
