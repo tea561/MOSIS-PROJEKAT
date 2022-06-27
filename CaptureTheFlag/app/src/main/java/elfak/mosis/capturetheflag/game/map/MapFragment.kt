@@ -3,20 +3,19 @@ package elfak.mosis.capturetheflag.game.map
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
-import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -29,6 +28,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -68,27 +68,58 @@ class MapFragment : Fragment() {
         val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { view ->
             val dialog = BottomSheetDialog(requireContext())
+            dialog.setCancelable(true)
             val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
             val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
             btnBarrier.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "PlaceBarrier");
+                openSetMarkerBottomSheet(dialog, "TeamBarrier");
             }
 
             val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
             btnEnemyBarrier.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "PlaceEnemyBarrier");
+                openSetMarkerBottomSheet(dialog, "EnemyBarrier");
             }
 
             val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
             btnEnemyFlag.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "PlaceEnemyFlag");
+                openSetMarkerBottomSheet(dialog, "EnemyFlag");
             }
-            dialog.setCancelable(true)
+
             dialog.setContentView(view)
             dialog.show()
         }
 
+        val mapStateObserver = Observer<MapState> { state ->
+            if (state is MapState.ConfirmingMarker) {
+                //TODO: open bottom_sheet_confirm_marker
+                val marker = Marker(map)
+                marker.position = GeoPoint(state.latitude, state.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.icon = resolveMapIcon(state.type)
+                map.overlays.add(marker)
 
+                val dialog = BottomSheetDialog(requireContext())
+                dialog.setCancelable(false)
+                val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
+                val btnAccept = view.findViewById<Button>(R.id.btnAccept)
+                btnAccept.setOnClickListener {
+                    // TODO: send to DB
+                    //marker.icon.setTint(resolveIconColor(state.type))
+                    dialog.dismiss()
+                    Toast.makeText(requireContext(), "${state.type}, lat: ${state.latitude}, long: ${state.longitude}", Toast.LENGTH_SHORT).show()
+                }
+
+                val btnCancel = view.findViewById<Button>(R.id.btnCancel)
+                btnCancel.setOnClickListener {
+                    dialog.dismiss()
+                    Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
+                    map.overlays.remove(marker)
+                }
+                dialog.setContentView(view)
+                dialog.show()
+            }
+        }
+        mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver);
 
 
         val ctx: Context? = activity?.applicationContext
@@ -165,14 +196,38 @@ class MapFragment : Fragment() {
 
     }
 
-    private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, state: String) {
+    private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, type: String) {
         //TODO: pull out bottom_sheet_set_marker
         //TODO: put game into barrier marker positioning state
-        Log.d("MAP Set Marker", "State: $state");
+        Log.d("MAP Set Marker", "Type: $type");
+        mapViewModel.setMarkerType(type);
         dialog.dismiss()
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_set_marker, null)
+        /*val view = layoutInflater.inflate(R.layout.bottom_sheet_set_marker, null)
         dialog.setCancelable(false)
+
         dialog.setContentView(view)
-        dialog.show()
+        dialog.show()*/
+    }
+
+    private fun resolveMapIcon(type: String) : Drawable? {
+        if (type == "TeamBarrier") {
+            return resources.getDrawable(R.drawable.ic_road_barrier_solid)
+        }
+        if (type == "EnemyBarrier") {
+            return resources.getDrawable(R.drawable.ic_burst_solid)
+        }
+        if (type == "EnemyFlag") {
+            return resources.getDrawable(R.drawable.ic_location_crosshairs_solid)
+        }
+        return null
+    }
+    private fun resolveIconColor(type: String) : Int {
+        if (type == "TeamBarrier") {
+            return R.color.blue
+        }
+        if (type == "EnemyBarrier" || type== "EnemyFlag") {
+            return R.color.red_enemy
+        }
+        return R.color.black
     }
 }

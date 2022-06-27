@@ -39,6 +39,37 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         dbRef.child("locations").child(uid).setValue(location)
     }
 
+    fun setMarkerType(type: String) {
+        _mapState.value = MapState.PlacingMarker(type)
+    }
+
+    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+        Log.d("singleTapConfirmedHelper", "${p?.latitude} - ${p?.longitude}")
+        //TODO: proveriti stanje mape i handleovati event na pravi nacin
+        /*if (_mapState.value == MapState.PlacingBarrier) {
+
+        } else if (_mapState.value == MapState.PlacingEnemyBarrier) {
+
+        } else if (_mapState.value == MapState.PlacingEnemyFlag) {
+
+        } else if (_mapState.value == MapState.PlacingFlag) {
+
+        }*/
+
+        if (_mapState.value is MapState.PlacingMarker) {
+            val value = _mapState.value as MapState.PlacingMarker
+            Log.d("singleTapConfirmedHelper", value.type)
+            _mapState.value = MapState.ConfirmingMarker(value.type, p!!.latitude, p.longitude)
+        }
+
+        return true
+    }
+
+    override fun longPressHelper(p: GeoPoint?): Boolean {
+        Log.d("longPressHelper", "${p?.latitude} - ${p?.longitude}")
+        return false
+    }
+
     private fun subscribeToLocationInDB() {
         dbRef.child("locations").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -59,27 +90,15 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                 catch(e: DatabaseException) {
                     dbRef.child("locations").child(uid).setValue("")
                 }
-
-
-               /* } else {
-                    Log.e("MAPS", "Location unavailable.")
-                    dbRef.child("locations").child(uid).setValue("")
-                }*/
             }
         })
-
     }
 
-    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-        Log.d("singleTapConfirmedHelper", "${p?.latitude} - ${p?.longitude}")
-        //TODO: proveriti stanje mape i handleovati event na pravi nacin
-        return true
+    fun putGameObjectToDB(gameID: String, type: String, team: Int, lat: Double, long: Double) {
+        //TODO: put to DB
     }
 
-    override fun longPressHelper(p: GeoPoint?): Boolean {
-        Log.d("longPressHelper", "${p?.latitude} - ${p?.longitude}")
-        return false
-    }
+
 }
 
 class MapViewModelFactory(private val app: Application, private val uid: String) :
@@ -99,5 +118,6 @@ sealed class MapState {
     object PlacingEnemyBarrier : MapState()
     object PlacingEnemyFlag : MapState()
     object Idle: MapState()
-    //class UploadError(val message: String? = null) : StoreUploadState()
+    class PlacingMarker(val type: String = "") : MapState()
+    class ConfirmingMarker(val type: String = "", val latitude: Double, val longitude: Double) : MapState()
 }
