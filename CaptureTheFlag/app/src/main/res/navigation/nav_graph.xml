@@ -180,5 +180,11 @@
 
     </fragment>
 
+    <fragment android:id="@+id/FriendsFragment"
+        android:name="elfak.mosis.capturetheflag.friends.FriendsFragment"
+        android:label="@string/profile_fragment_label"
+        tools:layout="@layout/fragment_item_list">
+
+    </fragment>
 
     </navigation>

@@ -26,6 +26,7 @@ import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.FragmentLoginBinding
 import elfak.mosis.capturetheflag.model.AuthState
+import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import java.lang.Exception
 import java.util.concurrent.Executors
@@ -46,6 +47,8 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by activityViewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -117,6 +120,7 @@ class LoginFragment : Fragment() {
                     }
                 }
 
+                friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
                 findNavController().navigate(R.id.action_LoginFragment_to_MapFragment)
             }
             if (state is AuthState.AuthError) {

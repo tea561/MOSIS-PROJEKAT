@@ -163,42 +163,6 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    fun addFriend(friendUid: String){
-        val key = dbRef.child("users").push().key
-        if (key == null) {
-            Log.w(ContentValues.TAG, "Couldn't get push key for posts")
-        }
-        else {
-            val id = selectedUser!!.uid
-            dbRef.child("users").child(id).child("friends").child(friendUid).setValue(true)
-            val childEventListener = object : ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val friend: String = snapshot.key ?: ""
-                    if(friend != "" && !(selectedUser!!.friends.containsKey(friend)))
-                        selectedUser!!.friends[friend] = true
-                }
-
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w(TAG, "postComments:onCancelled", error.toException())
-                }
-            }
-            dbRef.child("users").child(id).child("friends").addChildEventListener(childEventListener)
-
-        }
-    }
-
     private fun validateLogin(username: String, password: String): Boolean {
         if (username.isBlank()) {
             _authState.value = AuthState.AuthError("Username blank or empty.")

@@ -19,6 +19,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import java.io.IOException
 import java.io.InputStream
@@ -30,6 +31,7 @@ class BluetoothServerFragment : Fragment() {
     private val REQUEST_ENABLE_BT = 1
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private val userViewModel: UserViewModel by activityViewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl("https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
@@ -145,7 +147,7 @@ class BluetoothServerFragment : Fragment() {
                 }
 
                 mmSocket.close()
-                userViewModel.addFriend(friendUid)
+                friendsViewModel.addFriend(currentUserUid, friendUid)
             }
 
 

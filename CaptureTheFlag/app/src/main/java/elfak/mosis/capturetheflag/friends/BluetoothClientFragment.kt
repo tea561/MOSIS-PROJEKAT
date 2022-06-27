@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import java.io.IOException
 import java.io.InputStream
@@ -34,6 +35,7 @@ class BluetoothClientFragment : Fragment() {
     private lateinit var bluetoothDevices: MutableList<BluetoothDevice>
     private lateinit var listAdapter: ArrayAdapter<BluetoothDevice>
     private val userViewModel: UserViewModel by activityViewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,7 +209,7 @@ class BluetoothClientFragment : Fragment() {
                 }
 
                 mmSocket.close()
-                userViewModel.addFriend(friendUid)
+                friendsViewModel.addFriend(uid, friendUid)
 
             }
 
