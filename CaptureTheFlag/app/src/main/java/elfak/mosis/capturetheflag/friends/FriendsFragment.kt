@@ -5,14 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.model.FriendsViewModel
 
 
@@ -46,7 +48,7 @@ class FriendsFragment : Fragment() {
                     else -> GridLayoutManager(context, columnCount)
                 }
 
-                val friendsAdapter = MyFriendsRecyclerViewAdapter()
+                val friendsAdapter = MyFriendsRecyclerViewAdapter({user -> openFriendProfile(user)}, emptyList())
                 adapter = friendsAdapter
                 friendsViewModel.friends.observe(viewLifecycleOwner) { newData ->
                     friendsAdapter.setData(newData)
@@ -57,6 +59,12 @@ class FriendsFragment : Fragment() {
             }
         }
         return view
+    }
+
+    private fun openFriendProfile(user: User){
+        setFragmentResult("requestFriend", bundleOf("bundleFriend" to user.uid))
+        findNavController().navigate(R.id.action_FriendsFragment_to_ProfileFragment)
+        Log.i("CLICK ON FRIEND", user.username ?: "empty")
     }
 
 //    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

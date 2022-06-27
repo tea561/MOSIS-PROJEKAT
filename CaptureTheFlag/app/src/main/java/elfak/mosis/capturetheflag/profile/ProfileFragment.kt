@@ -13,15 +13,20 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import com.google.android.material.textfield.TextInputEditText
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import java.lang.Exception
 import java.util.concurrent.Executors
 
 class ProfileFragment : Fragment() {
 
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
+    private var currentUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,33 +48,36 @@ class ProfileFragment : Fragment() {
         val firstAndLastName: TextView = requireView().findViewById<TextView>(R.id.textViewFirstAndLastName)
         val aboutMeDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
 
-        val img = userViewModel.image.value
-        val url = userViewModel.selectedUser?.imgUrl
+        setFragmentResultListener("requestFriend") { _, bundle ->
+            val result = bundle.get("bundleFriend")
+            currentUser = friendsViewModel.friends.value?.find { friend -> friend.uid == result}
 
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        var image: Bitmap? = null
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
+            var image: Bitmap? = null
 
-        executor.execute{
-            val imageUrl = userViewModel.selectedUser?.imgUrl
-            try {
-                val `in` = java.net.URL(imageUrl).openStream()
-                image = BitmapFactory.decodeStream(`in`)
+            executor.execute{
+                val imageUrl = currentUser?.imgUrl
+                try {
+                    val `in` = java.net.URL(imageUrl).openStream()
+                    image = BitmapFactory.decodeStream(`in`)
 
-                handler.post{
-                    imageProfile.setImageBitmap(image)
+                    handler.post{
+                        imageProfile.setImageBitmap(image)
+                    }
+                }
+                catch(e: Exception){
+                    e.printStackTrace()
                 }
             }
-            catch(e: Exception){
-                e.printStackTrace()
-            }
+
+
+            username.text = currentUser?.username ?: ""
+            firstAndLastName.text = "${currentUser?.firstName} ${currentUser?.lastName}"
+            aboutMeDesc.setText(currentUser?.desc)
+
+
         }
-
-
-        username.text = userViewModel.selectedUser?.username ?: ""
-        firstAndLastName.text = "${userViewModel.selectedUser?.firstName} ${userViewModel.selectedUser?.lastName}"
-        aboutMeDesc.setText(userViewModel.selectedUser?.desc)
-
 
     }
 

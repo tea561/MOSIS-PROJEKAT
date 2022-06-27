@@ -53,5 +53,6 @@
     <string name="let_your_friends_discover_you">Let your friends find you</string>
     <string name="no_friends">You don\'t have any friends yet</string>
     <string name="no_friends_desc">Connect with friends and capture the flag together</string>
+    <string name="invite_friend">Invite friend</string>
 
 </resources>

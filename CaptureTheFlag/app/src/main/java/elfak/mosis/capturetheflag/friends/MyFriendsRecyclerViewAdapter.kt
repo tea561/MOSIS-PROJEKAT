@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyFriendsRecyclerViewAdapter(
+class MyFriendsRecyclerViewAdapter(private val onClick: (User) -> Unit,
     private var values: List<User> = emptyList()
 ) : RecyclerView.Adapter<MyFriendsRecyclerViewAdapter.ViewHolder>() {
 
@@ -33,7 +33,8 @@ class MyFriendsRecyclerViewAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onClick
         )
 
     }
@@ -45,6 +46,7 @@ class MyFriendsRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
+        holder.currentFriend = item
         holder.idView.text = "${item.firstName} ${item.lastName}"
         holder.contentView.text = item.username
 
@@ -70,10 +72,16 @@ class MyFriendsRecyclerViewAdapter(
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(binding: FragmentItemBinding, val onClick: (User) -> Unit) : RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.friendName
         val contentView: TextView = binding.friendUsername
         val imageViewFriend: ImageView = binding.imageViewFriend
+        var currentFriend: User? = null
+
+
+        init {
+            binding.root.setOnClickListener { currentFriend?.let { onClick(it) } }
+        }
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"

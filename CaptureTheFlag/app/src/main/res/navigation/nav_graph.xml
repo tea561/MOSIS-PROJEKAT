@@ -185,6 +185,10 @@
         android:label="@string/profile_fragment_label"
         tools:layout="@layout/fragment_item_list">
 
+        <action
+            android:id="@+id/action_FriendsFragment_to_ProfileFragment"
+            app:destination="@id/ProfileFragment" />
+
     </fragment>
 
     </navigation>
