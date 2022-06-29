@@ -104,6 +104,10 @@
         android:label="@string/home_fragment_label"
         tools:layout="@layout/fragment_home">
 
+        <action
+            android:id="@+id/action_HomeFragment_to_CreateGameFragment"
+            app:destination="@id/CreateGameFragment" />
+
 
     </fragment>
 
@@ -188,6 +192,17 @@
         <action
             android:id="@+id/action_FriendsFragment_to_ProfileFragment"
             app:destination="@id/ProfileFragment" />
+
+    </fragment>
+
+    <fragment android:id="@+id/CreateGameFragment"
+        android:name="elfak.mosis.capturetheflag.game.setup.CreateGameFragment"
+        android:label="Create Game"
+        tools:layout="@layout/fragment_create_game">
+
+        <action
+            android:id="@+id/action_CreateGameFragment_to_FriendsFragment"
+            app:destination="@id/FriendsFragment" />
 
     </fragment>
 

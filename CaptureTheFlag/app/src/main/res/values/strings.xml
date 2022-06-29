@@ -54,5 +54,8 @@
     <string name="no_friends">You don\'t have any friends yet</string>
     <string name="no_friends_desc">Connect with friends and capture the flag together</string>
     <string name="invite_friend">Invite friend</string>
+    <string name="invite_friendds">Invite friends</string>
+    <string name="team_1">Team 1</string>
+    <string name="team_2">Team 2</string>
 
 </resources>
