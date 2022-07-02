@@ -21,6 +21,8 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
@@ -38,6 +40,7 @@ class MapFragment : Fragment() {
     private lateinit var mapViewModel: MapViewModel
     private lateinit var map: MapView
     private val userViewModel: UserViewModel by activityViewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -66,97 +69,19 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener { view ->
-            val dialog = BottomSheetDialog(requireContext())
-            dialog.setCancelable(true)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
-            val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
-            btnBarrier.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "TeamBarrier");
-            }
+        fab.setOnClickListener { fabOnClick() }
 
-            val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
-            btnEnemyBarrier.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "EnemyBarrier");
-            }
+        val mapStateObserver = Observer<MapState> { state -> setMapStateObserver(state) }
+        mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver)
 
-            val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
-            btnEnemyFlag.setOnClickListener {
-                openSetMarkerBottomSheet(dialog, "EnemyFlag");
-            }
-
-            dialog.setContentView(view)
-            dialog.show()
-        }
-
-        val mapStateObserver = Observer<MapState> { state ->
-            if (state is MapState.ConfirmingMarker) {
-                //TODO: open bottom_sheet_confirm_marker
-                val marker = Marker(map)
-                marker.position = GeoPoint(state.latitude, state.longitude)
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                marker.icon = resolveMapIcon(state.type)
-                map.overlays.add(marker)
-
-                val dialog = BottomSheetDialog(requireContext())
-                dialog.setCancelable(false)
-                val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
-                val btnAccept = view.findViewById<Button>(R.id.btnAccept)
-                btnAccept.setOnClickListener {
-                    // TODO: send to DB
-                    //marker.icon.setTint(resolveIconColor(state.type))
-                    dialog.dismiss()
-                    Toast.makeText(requireContext(), "${state.type}, lat: ${state.latitude}, long: ${state.longitude}", Toast.LENGTH_SHORT).show()
-                }
-
-                val btnCancel = view.findViewById<Button>(R.id.btnCancel)
-                btnCancel.setOnClickListener {
-                    dialog.dismiss()
-                    Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
-                    map.overlays.remove(marker)
-                }
-                dialog.setContentView(view)
-                dialog.show()
-            }
-        }
-        mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver);
-
-
-        val ctx: Context? = activity?.applicationContext
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
-        map = requireView().findViewById(R.id.map)
-
-        if (ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_DENIED
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-        else {
-            setMyLocationOverlay()
-        }
-
-        map.setMultiTouchControls(true)
-        map.controller.setZoom(20.0)
-//        map.controller.setCenter(GeoPoint(43.3209, 21.8958))
-        val mapEventsOverlay = MapEventsOverlay(mapViewModel)
-        map.overlays.add(mapEventsOverlay)
-
+        initMapView()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mapViewModel = ViewModelProvider(this,
             MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -185,7 +110,6 @@ class MapFragment : Fragment() {
 
     private fun checkLocationServiceRunning(): Boolean {
         val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
         //FIXME: fix service starting while already running
         for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
             if (LocationService::class.simpleName == service.service.className) {
@@ -193,20 +117,12 @@ class MapFragment : Fragment() {
             }
         }
         return false
-
     }
 
     private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, type: String) {
-        //TODO: pull out bottom_sheet_set_marker
-        //TODO: put game into barrier marker positioning state
-        Log.d("MAP Set Marker", "Type: $type");
-        mapViewModel.setMarkerType(type);
+        Log.d("MAP Set Marker", "Type: $type")
+        mapViewModel.setMapState(type)
         dialog.dismiss()
-        /*val view = layoutInflater.inflate(R.layout.bottom_sheet_set_marker, null)
-        dialog.setCancelable(false)
-
-        dialog.setContentView(view)
-        dialog.show()*/
     }
 
     private fun resolveMapIcon(type: String) : Drawable? {
@@ -229,5 +145,118 @@ class MapFragment : Fragment() {
             return R.color.red_enemy
         }
         return R.color.black
+    }
+
+    private fun fabOnClick() {
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setCancelable(true)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
+        val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
+        btnBarrier.setOnClickListener {
+            openSetMarkerBottomSheet(dialog, "TeamBarrier")
+        }
+
+        val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
+        btnEnemyBarrier.setOnClickListener {
+            openSetMarkerBottomSheet(dialog, "EnemyBarrier")
+        }
+
+        val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
+        btnEnemyFlag.setOnClickListener {
+            openSetMarkerBottomSheet(dialog, "EnemyFlag")
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    private fun setMapStateObserver(state: MapState) {
+        val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
+        if (state is MapState.ConfirmingMarker) {
+            fab.show()
+            mapObserverConfirmingMarker(state)
+        }
+        if (state is MapState.Idle) {
+            fab.hide()
+        }
+        if (state is MapState.InGame) {
+            //TODO: get info about game if not present
+            fab.show()
+        }
+        if (state is MapState.PlacingMarker) {
+            //TODO: idk dal treba nesto
+            fab.show()
+        }
+        if (state is MapState.Cooldown) {
+            //TODO: display border on map and cooldown bottom sheet
+            fab.hide()
+        }
+    }
+
+    private fun mapObserverConfirmingMarker(state: MapState.ConfirmingMarker) {
+        val marker = Marker(map)
+        marker.position = GeoPoint(state.latitude, state.longitude)
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        marker.icon = resolveMapIcon(state.type)
+        map.overlays.add(marker)
+
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setCancelable(false)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
+        val btnAccept = view.findViewById<Button>(R.id.btnAccept)
+        btnAccept.setOnClickListener {
+            // TODO: send to DB
+            dialog.dismiss()
+            Toast.makeText(
+                requireContext(),
+                "${state.type}, lat: ${state.latitude}, long: ${state.longitude}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        val btnCancel = view.findViewById<Button>(R.id.btnCancel)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
+            map.overlays.remove(marker)
+        }
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    private fun initMapView() {
+        val ctx: Context? = activity?.applicationContext
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
+        map = requireView().findViewById(R.id.map)
+
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_DENIED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        else {
+            setMyLocationOverlay()
+        }
+
+        map.setMultiTouchControls(true)
+        map.controller.setZoom(20.0)
+        val mapEventsOverlay = MapEventsOverlay(mapViewModel)
+        map.overlays.add(mapEventsOverlay)
+    }
+
+    private fun initFriendsOnMap() {
+        friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
+        val friendsObserver = Observer<MutableList<User>> { state -> setFriendsObserver(state) }
+        friendsViewModel.friends.observe(viewLifecycleOwner, friendsObserver)
+    }
+
+    private fun setFriendsObserver(friendsList: MutableList<User>) {
+
     }
 }

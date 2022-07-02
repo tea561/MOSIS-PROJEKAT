@@ -33,35 +33,23 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
 
     init {
         subscribeToLocationInDB()
+        _mapState.value = MapState.Idle
     }
 
     fun setLocation(location: GeoPoint) {
         dbRef.child("locations").child(uid).setValue(location)
     }
 
-    fun setMarkerType(type: String) {
+    fun setMapState(type: String) {
         _mapState.value = MapState.PlacingMarker(type)
     }
 
     override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-        Log.d("singleTapConfirmedHelper", "${p?.latitude} - ${p?.longitude}")
-        //TODO: proveriti stanje mape i handleovati event na pravi nacin
-        /*if (_mapState.value == MapState.PlacingBarrier) {
-
-        } else if (_mapState.value == MapState.PlacingEnemyBarrier) {
-
-        } else if (_mapState.value == MapState.PlacingEnemyFlag) {
-
-        } else if (_mapState.value == MapState.PlacingFlag) {
-
-        }*/
-
         if (_mapState.value is MapState.PlacingMarker) {
             val value = _mapState.value as MapState.PlacingMarker
             Log.d("singleTapConfirmedHelper", value.type)
             _mapState.value = MapState.ConfirmingMarker(value.type, p!!.latitude, p.longitude)
         }
-
         return true
     }
 
@@ -84,7 +72,7 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                     }
                     else {
                         Log.i("MAPS", "Location: ${location.latitude}, ${location.longitude}")
-                        _userLocation.value = location!!
+                        _userLocation.value = location
                     }
                 }
                 catch(e: DatabaseException) {
@@ -97,13 +85,11 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
     fun putGameObjectToDB(gameID: String, type: String, team: Int, lat: Double, long: Double) {
         //TODO: put to DB
     }
-
-
 }
 
 class MapViewModelFactory(private val app: Application, private val uid: String) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MapViewModel(app, uid) as T
     }
 }
@@ -113,11 +99,9 @@ class FirebaseLocation: Location(LocationManager.GPS_PROVIDER) {
 }
 
 sealed class MapState {
-    object PlacingFlag : MapState()
-    object PlacingBarrier : MapState()
-    object PlacingEnemyBarrier : MapState()
-    object PlacingEnemyFlag : MapState()
     object Idle: MapState()
+    class InGame(val gameId: String): MapState()
+    class Cooldown(val timespan: Number = 120): MapState()
     class PlacingMarker(val type: String = "") : MapState()
     class ConfirmingMarker(val type: String = "", val latitude: Double, val longitude: Double) : MapState()
 }
