@@ -109,6 +109,11 @@
             app:destination="@id/CreateGameFragment" />
 
 
+        <action
+            android:id="@+id/action_HomeFragment_to_JoinGameFragment"
+            app:destination="@id/JoinGameFragment" />
+
+
     </fragment>
 
     <fragment
@@ -201,8 +206,22 @@
         tools:layout="@layout/fragment_create_game">
 
         <action
-            android:id="@+id/action_CreateGameFragment_to_FriendsFragment"
-            app:destination="@id/FriendsFragment" />
+            android:id="@+id/action_CreateGameFragment_to_GameCodeFragment"
+            app:destination="@id/GameCodeFragment" />
+
+    </fragment>
+
+    <fragment android:id="@+id/GameCodeFragment"
+        android:name="elfak.mosis.capturetheflag.game.setup.GameCodeFragment"
+        android:label="Game Code"
+        tools:layout="@layout/fragment_game_code">
+
+    </fragment>
+
+    <fragment android:id="@+id/JoinGameFragment"
+        android:name="elfak.mosis.capturetheflag.game.setup.JoinGameFragment"
+        android:label="Join Game"
+        tools:layout="@layout/fragment_join_game">
 
     </fragment>
 

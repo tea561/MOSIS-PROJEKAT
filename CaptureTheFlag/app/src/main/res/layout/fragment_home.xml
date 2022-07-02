@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ic_subtract"
     android:orientation="vertical"
     tools:context=".common.HomeFragment">
 
@@ -28,6 +27,18 @@
         android:layout_marginTop="34dp"
         android:backgroundTint="@color/blue"
         android:text="@string/create_game"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonJoinGameWithCode"
+        android:layout_width="254dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="78dp"
+        android:layout_marginTop="34dp"
+        android:backgroundTint="@color/blue"
+        android:text="@string/join_game"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="20sp"
         android:textStyle="bold" />

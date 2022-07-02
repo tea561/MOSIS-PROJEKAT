@@ -56,8 +56,8 @@
 
     <ImageView
         android:id="@+id/imageView5"
-        android:layout_width="676dp"
-        android:layout_height="910dp"
+        android:layout_width="549dp"
+        android:layout_height="808dp"
         android:layout_gravity="top"
         android:src="@drawable/drocka_blue" />
 

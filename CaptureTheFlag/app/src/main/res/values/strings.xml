@@ -39,8 +39,8 @@
     <string name="get_started">Get started</string>
     <string name="title">Capture The Flag</string>
     <string name="create_game">Create Game</string>
-    <string name="find_friend">Find friend</string>
-    <string name="how_to_play">How to play</string>
+    <string name="find_friend">Find Friend</string>
+    <string name="how_to_play">How to Play</string>
     <string name="add_friend">Add friend</string>
     <string name="first_and_last_name">First Last</string>
     <string name="about_me">About me</string>
@@ -57,5 +57,8 @@
     <string name="invite_friendds">Invite friends</string>
     <string name="team_1">Team 1</string>
     <string name="team_2">Team 2</string>
+    <string name="share_code">Share game code with your friends and start the game</string>
+    <string name="start">Start</string>
+    <string name="join_game">Join Game</string>
 
 </resources>

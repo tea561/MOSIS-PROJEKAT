@@ -51,8 +51,9 @@ class CreateGameFragment : Fragment() {
                 Toast.makeText(view.context, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
             }
             else {
-                gameViewModel.createGame(team1, team2)
-                //TODO: nav
+                val randomString = gameViewModel.createGame(team1, team2)
+                setFragmentResult("requestCode", bundleOf("bundleCode" to randomString))
+                findNavController().navigate(R.id.action_CreateGameFragment_to_GameCodeFragment)
             }
         }
 

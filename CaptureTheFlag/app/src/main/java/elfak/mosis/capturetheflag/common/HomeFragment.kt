@@ -38,6 +38,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_HomeFragment_to_CreateGameFragment)
         }
 
+        binding.buttonJoinGameWithCode.setOnClickListener{
+            findNavController().navigate(R.id.action_HomeFragment_to_JoinGameFragment)
+        }
+
     }
 
 }
