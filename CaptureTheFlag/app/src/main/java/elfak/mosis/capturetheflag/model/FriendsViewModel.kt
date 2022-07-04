@@ -42,8 +42,11 @@ class FriendsViewModel : ViewModel() {
                 val user = snapshot.getValue(User::class.java)
                 if(_friends.value == null)
                     _friends.value = mutableListOf()
-                if(user != null)
-                    _friends.value!!.add(user)
+                if(user != null && !_friends.value!!.contains(user)) {
+                    val list  = _friends.value
+                    list?.add(user)
+                    _friends.value = list
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
