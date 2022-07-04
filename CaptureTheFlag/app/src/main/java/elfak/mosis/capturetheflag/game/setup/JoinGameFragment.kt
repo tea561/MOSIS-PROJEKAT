@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentJoinGameBinding
 import elfak.mosis.capturetheflag.game.viewmodel.FindGameState
@@ -49,6 +50,7 @@ class JoinGameFragment : Fragment() {
 
         val findGameObserver = Observer<FindGameState> {state ->
             if(state is FindGameState.Success){
+                findNavController().navigate(R.id.action_JoinGameFragment_to_ChooseTeamFragment)
                 Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
             }
             if(state is FindGameState.FindGameError){

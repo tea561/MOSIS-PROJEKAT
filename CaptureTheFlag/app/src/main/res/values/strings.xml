@@ -60,5 +60,6 @@
     <string name="share_code">Share game code with your friends and start the game</string>
     <string name="start">Start</string>
     <string name="join_game">Join Game</string>
+    <string name="choose_team">Choose Team</string>
 
 </resources>

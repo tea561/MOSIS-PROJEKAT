@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentCreateGameBinding
 import elfak.mosis.capturetheflag.databinding.FragmentGameCodeBinding
@@ -32,6 +33,10 @@ class GameCodeFragment : Fragment() {
 
         setFragmentResultListener("requestCode") { requestCode, bundle ->
             binding.textViewGameCode.text = bundle.getString("bundleCode")
+        }
+
+        binding.buttonStartTheGame.setOnClickListener {
+            findNavController().navigate(R.id.action_GameCodeFragment_to_ChooseTeamFragment)
         }
 
     }

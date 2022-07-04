@@ -216,12 +216,29 @@
         android:label="Game Code"
         tools:layout="@layout/fragment_game_code">
 
+        <action android:id="@+id/action_GameCodeFragment_to_ChooseTeamFragment"
+            app:destination="@id/ChooseTeamFragment">
+        </action>
+
     </fragment>
 
     <fragment android:id="@+id/JoinGameFragment"
         android:name="elfak.mosis.capturetheflag.game.setup.JoinGameFragment"
         android:label="Join Game"
         tools:layout="@layout/fragment_join_game">
+
+
+        <action
+            android:id="@+id/action_JoinGameFragment_to_ChooseTeamFragment"
+            app:destination="@id/ChooseTeamFragment" />
+
+    </fragment>
+
+    <fragment android:id="@+id/ChooseTeamFragment"
+        android:name="elfak.mosis.capturetheflag.game.setup.ChooseTeamFragment"
+        android:label="Choose Team"
+        tools:layout="@layout/fragment_choose_team">
+
 
     </fragment>
 

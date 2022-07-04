@@ -1,5 +1,7 @@
 package elfak.mosis.capturetheflag.game.viewmodel
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +11,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.util.*
+import kotlin.collections.HashMap
 
 class GameViewModel : ViewModel() {
     //var _gameState: MutableLiveData<GameState>
@@ -16,8 +19,12 @@ class GameViewModel : ViewModel() {
     private val _findGameState by lazy { MutableLiveData<FindGameState>(FindGameState.Idle)}
     var findGameState: LiveData<FindGameState> = _findGameState
 
-    private lateinit var team1name: String
-    private lateinit var team2name: String
+    private val _joinGameState by lazy { MutableLiveData<FindGameState>(FindGameState.Idle)}
+    var joinGameState: LiveData<FindGameState> = _joinGameState
+
+    lateinit var team1name: String
+    lateinit var team2name: String
+    lateinit var gameUid: String
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
@@ -26,6 +33,9 @@ class GameViewModel : ViewModel() {
     public fun createGame(team1: String, team2: String): String{
         val uniqueID: String = UUID.randomUUID().toString()
         val gameCode: String = randomString()
+        gameUid = uniqueID
+        team1name = team1
+        team2name = team2
 
         dbRef.child("games").child(uniqueID).child("team1").child("name").setValue(team1)
         dbRef.child("games").child(uniqueID).child("team2").child("name").setValue(team2)
@@ -37,6 +47,13 @@ class GameViewModel : ViewModel() {
         dbRef.child("games").orderByChild("gameCode").equalTo(gameCode).addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.value != null){
+                    val hashMap: HashMap<Any, Any> = snapshot.value as HashMap<Any, Any> /* = java.util.HashMap<kotlin.Any, kotlin.Any> */
+                    hashMap.forEach{ entry ->
+                        val data = entry.value as HashMap<Any, Any>
+                        team1name = (data["team1"] as Map<String, Any>).getValue("name") as String
+                        team2name = (data["team2"] as Map<String, Any>).getValue("name") as String
+                        gameUid = entry.key as String
+                    }
                     _findGameState.value = FindGameState.Success("Game found.")
                 }
                 else{
@@ -47,6 +64,26 @@ class GameViewModel : ViewModel() {
                 _findGameState.value = FindGameState.FindGameError(error.message)
             }
         })
+    }
+
+    public fun addPlayerToGame(userUid: String, teamNum: Int)
+    {
+        val team = if(teamNum == 1) "team1" else "team2"
+        val key = dbRef.child("games").child(gameUid).child(team).push().key
+        if(key == null){
+            _joinGameState.value = FindGameState.FindGameError("Couldn't get push key for posts")
+            Log.w(ContentValues.TAG, "Couldn't get push key for posts")
+        }
+        else {
+            dbRef.child("games").child(gameUid).child(team).child("players").child(userUid).setValue(true)
+                .addOnSuccessListener {
+                    _joinGameState.value = FindGameState.Success("User added to game.")
+                }
+                .addOnFailureListener {
+                    _joinGameState.value = FindGameState.FindGameError(it.message)
+                }
+
+        }
     }
 
     private fun randomString(): String {
