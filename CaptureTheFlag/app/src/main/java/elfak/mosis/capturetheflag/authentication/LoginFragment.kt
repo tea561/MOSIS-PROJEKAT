@@ -120,7 +120,7 @@ class LoginFragment : Fragment() {
                     }
                 }
 
-                friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
+
                 findNavController().navigate(R.id.action_LoginFragment_to_MapFragment)
             }
             if (state is AuthState.AuthError) {

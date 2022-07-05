@@ -2,14 +2,19 @@ package elfak.mosis.capturetheflag.game.viewmodel
 
 import android.content.ContentValues
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.MapObject
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -25,6 +30,7 @@ class GameViewModel : ViewModel() {
     lateinit var team1name: String
     lateinit var team2name: String
     lateinit var gameUid: String
+    var teamNumber: Int = -1
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
@@ -68,6 +74,7 @@ class GameViewModel : ViewModel() {
 
     public fun addPlayerToGame(userUid: String, teamNum: Int)
     {
+        teamNumber = teamNum
         val team = if(teamNum == 1) "team1" else "team2"
         val key = dbRef.child("games").child(gameUid).child(team).push().key
         if(key == null){
@@ -84,6 +91,21 @@ class GameViewModel : ViewModel() {
                 }
 
         }
+    }
+
+    fun putGameObjectToDB(gameID: String, type: String, team: Int, lat: Double, long: Double) {
+        //TODO: put to DB
+        val teamString = if(team == 1) "team1" else "team2"
+        val uniqueID: String = UUID.randomUUID().toString()
+        val timestamp = System.currentTimeMillis()  //LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        val mapObject = MapObject(uniqueID, lat, long, type, timestamp)
+        dbRef.child("games").child(gameUid).child(teamString).child("objects").child(uniqueID).setValue(mapObject)
+            .addOnSuccessListener {
+                Log.i("GAME", "Object of type $type inserted into DB with uid: $uniqueID .")
+            }
+            .addOnFailureListener {
+                Log.e("GAME", "Error while inserting object of type $type, message was: ${it.message}")
+            }
     }
 
     private fun randomString(): String {

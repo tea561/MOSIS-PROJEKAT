@@ -14,15 +14,16 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.utils.extensions.FirebaseGeoPoint
+import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
 import kotlinx.coroutines.selects.select
+import org.osmdroid.util.GeoPoint
 import java.io.ByteArrayOutputStream
 
 class UserViewModel : ViewModel() {
@@ -160,6 +161,37 @@ class UserViewModel : ViewModel() {
                 _uploadState.value =
                     StoreUploadState.Success("Upload successful with image URL: $photoUrl")
             }
+        }
+    }
+
+    fun getLocationForUser(userID: String): FirebaseLocation? {
+        var userLocation: FirebaseLocation? = null
+        try {
+                dbRef.child("locations").child(userID).get().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    dbRef.child("locations").addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(error: DatabaseError) {
+                            //TODO
+                        }
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.hasChild(selectedUser!!.uid)) {
+                                val child = snapshot.child(selectedUser!!.uid)
+                                userLocation = child.getValue(FirebaseLocation::class.java)
+                            } else {
+                                Log.e("USER", "Get Location Error: user does not exist in database.")
+                            }
+                        }
+                    })
+                }
+                else {
+                    Log.e("USER", "Get User Location Not successful")
+                }
+            }
+            return userLocation
+        }
+        catch (e: DatabaseException) {
+            Log.e("USER", e.message.toString())
+            return null
         }
     }
 

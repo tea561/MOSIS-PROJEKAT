@@ -22,6 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
@@ -41,6 +42,7 @@ class MapFragment : Fragment() {
     private lateinit var map: MapView
     private val userViewModel: UserViewModel by activityViewModels()
     private val friendsViewModel: FriendsViewModel by activityViewModels()
+    private val gameViewModel: GameViewModel by activityViewModels()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -50,6 +52,13 @@ class MapFragment : Fragment() {
                 setMyLocationOverlay()
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mapViewModel = ViewModelProvider(requireActivity(),
+            MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +76,7 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
         val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { fabOnClick() }
 
@@ -75,13 +84,7 @@ class MapFragment : Fragment() {
         mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver)
 
         initMapView()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mapViewModel = ViewModelProvider(this,
-            MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
-        setHasOptionsMenu(true)
+        initFriendsOnMap()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -113,6 +116,7 @@ class MapFragment : Fragment() {
         //FIXME: fix service starting while already running
         for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
             if (LocationService::class.simpleName == service.service.className) {
+                Log.e("MAP", "Location Service already running.")
                 return true
             }
         }
@@ -121,7 +125,7 @@ class MapFragment : Fragment() {
 
     private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, type: String) {
         Log.d("MAP Set Marker", "Type: $type")
-        mapViewModel.setMapState(type)
+        mapViewModel.setPlacingMarkerMapState(type)
         dialog.dismiss()
     }
 
@@ -205,7 +209,8 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
-            // TODO: send to DB
+            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.teamNumber, state.latitude, state.longitude)
+
             dialog.dismiss()
             Toast.makeText(
                 requireContext(),
@@ -248,15 +253,36 @@ class MapFragment : Fragment() {
         map.controller.setZoom(20.0)
         val mapEventsOverlay = MapEventsOverlay(mapViewModel)
         map.overlays.add(mapEventsOverlay)
+
+
     }
 
     private fun initFriendsOnMap() {
-        friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
-        val friendsObserver = Observer<MutableList<User>> { state -> setFriendsObserver(state) }
+        val friendsObserver = Observer<MutableList<User>> { state ->
+            setFriendsObserver(state)
+        }
         friendsViewModel.friends.observe(viewLifecycleOwner, friendsObserver)
+        //friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
     }
 
     private fun setFriendsObserver(friendsList: MutableList<User>) {
-
+        //TODO: draw friends on map
+        if (friendsList.isEmpty()) {
+            Toast.makeText(context, "No friends", Toast.LENGTH_SHORT).show()
+        }
+        friendsList.forEach{ friend ->
+            val friendLocation = userViewModel.getLocationForUser(friend.uid)
+            if (friendLocation != null) {
+                val marker = Marker(map)
+                marker.position = GeoPoint(friendLocation.latitude, friendLocation.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon.setTint(R.color.blue)
+                map.overlays.add(marker)
+            }
+            else {
+                Toast.makeText(context, "Location Null", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
