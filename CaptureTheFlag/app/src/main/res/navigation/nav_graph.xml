@@ -239,6 +239,9 @@
         android:label="Choose Team"
         tools:layout="@layout/fragment_choose_team">
 
+        <action
+            android:id="@+id/action_ChooseTeamFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
 
     </fragment>
 
