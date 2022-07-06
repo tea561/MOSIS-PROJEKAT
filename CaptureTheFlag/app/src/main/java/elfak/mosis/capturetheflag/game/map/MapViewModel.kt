@@ -2,9 +2,7 @@ package elfak.mosis.capturetheflag.game.map
 
 import android.app.Application
 import android.location.Location
-import android.location.LocationManager
 import android.util.Log
-import android.widget.ListView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,11 +13,11 @@ import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.data.UserWithLocation
 import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 
 class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsReceiver {
@@ -35,9 +33,13 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
 
     var mapFilters = MapFilters()
 
+    private var _friends = MutableLiveData<MutableMap<String,UserWithLocation>>()
+    var friends: LiveData<MutableMap<String,UserWithLocation>> = _friends
+
     init {
         subscribeToLocationInDB()
         _mapState.value = MapState.Idle
+        _friends.value = mutableMapOf<String, UserWithLocation>()
     }
 
     fun setLocation(location: GeoPoint) {
@@ -86,6 +88,47 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                 }
                 catch(e: DatabaseException) {
                     dbRef.child("locations").child(uid).setValue("")
+                }
+            }
+        })
+    }
+
+    fun setFriends(friendsList: List<User>) {
+        friendsList.forEach { user ->
+            val uid = user.uid
+            val userWithLocation = UserWithLocation(user, null)
+            _friends.value!![uid] = userWithLocation
+        }
+        getFriendLocations(friendsList)
+    }
+
+    private fun getFriendLocations(friendsList: List<User>) {
+        friendsList.forEach { user ->
+            subscribeToFriendLocationInDB(user.uid)
+        }
+    }
+
+    private fun subscribeToFriendLocationInDB(friendID: String) {
+        dbRef.child("locations").addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("MAP", error.message)
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                try {
+                    val friendLocation = snapshot.child(friendID).getValue(FirebaseLocation::class.java)
+                    if (friendLocation == null) {
+                        Log.i("MAPS", "Location not set yet.")
+                        dbRef.child("locations").child(friendID).setValue("")
+                    }
+                    else {
+                        Log.i("MAPS", "Location: ${friendLocation.latitude}, ${friendLocation.longitude}")
+                        val list = _friends.value
+                        list!![friendID]?.location = friendLocation
+                        _friends.value = list
+                    }
+                }
+                catch(e: DatabaseException) {
+                    dbRef.child("locations").child(friendID).setValue("")
                 }
             }
         })

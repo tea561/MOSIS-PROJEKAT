@@ -22,6 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.data.UserWithLocation
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
@@ -262,12 +263,19 @@ class MapFragment : Fragment() {
             setFriendsObserver(state)
         }
         friendsViewModel.friends.observe(viewLifecycleOwner, friendsObserver)
-        //friendsViewModel.getFriends(userViewModel.selectedUser!!.uid)
+
+        val friendsWithLocationsObserver = Observer<MutableMap<String, UserWithLocation>> { state ->
+            setUserWithLocationsObserver(state)
+        }
+        mapViewModel.friends.observe(viewLifecycleOwner, friendsWithLocationsObserver)
     }
 
     private fun setFriendsObserver(friendsList: MutableList<User>) {
-        //TODO: draw friends on map
-        if (friendsList.isEmpty()) {
+        if(friendsList.isNotEmpty()){
+            mapViewModel.setFriends(friendsList)
+        }
+
+        /*if (friendsList.isEmpty()) {
             Toast.makeText(context, "No friends", Toast.LENGTH_SHORT).show()
         }
         friendsList.forEach{ friend ->
@@ -282,6 +290,20 @@ class MapFragment : Fragment() {
             }
             else {
                 Toast.makeText(context, "Location Null", Toast.LENGTH_SHORT).show()
+            }
+        }*/
+    }
+
+    private fun setUserWithLocationsObserver(state: MutableMap<String, UserWithLocation>) {
+        //TODO: Draw
+        state.forEach { (uid, user) ->
+            if (user.location != null) {
+                val marker = Marker(map)
+                marker.position = GeoPoint(user.location!!.latitude, user.location!!.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon.setTint(R.color.blue)
+                map.overlays.add(marker)
             }
         }
     }

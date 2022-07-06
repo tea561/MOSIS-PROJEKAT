@@ -13,9 +13,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentCreateGameBinding
-import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
-import elfak.mosis.capturetheflag.model.UserViewModel
 
 class CreateGameFragment : Fragment() {
 
@@ -31,7 +29,7 @@ class CreateGameFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentCreateGameBinding.inflate(inflater, container, false)
         return binding.root
