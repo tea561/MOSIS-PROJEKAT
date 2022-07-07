@@ -32,8 +32,8 @@ class BluetoothClientFragment : Fragment() {
 
     private val REQUEST_ENABLE_BT = 1
     private lateinit var bluetoothAdapter: BluetoothAdapter
-    private lateinit var bluetoothDevices: MutableList<BluetoothDevice>
-    private lateinit var listAdapter: ArrayAdapter<BluetoothDevice>
+    private var bluetoothDevices =  mutableListOf<BluetoothDevice>()
+    private lateinit var listAdapter: BTDeviceAdapter
     private val userViewModel: UserViewModel by activityViewModels()
     private val friendsViewModel: FriendsViewModel by activityViewModels()
 
@@ -62,7 +62,7 @@ class BluetoothClientFragment : Fragment() {
 
         val buttonScan: Button = requireView().findViewById(R.id.buttonScan)
         val pairedDevicesList: ListView = requireView().findViewById(R.id.listViewPairedDevices)
-        listAdapter = ArrayAdapter<BluetoothDevice>(view.context, android.R.layout.simple_list_item_1)
+        listAdapter = BTDeviceAdapter(view.context, bluetoothDevices)
         pairedDevicesList.adapter = listAdapter
         pairedDevicesList.setOnItemClickListener(object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -85,8 +85,8 @@ class BluetoothClientFragment : Fragment() {
 //                    val deviceHardwareAddress = device.address // MAC address
 //                    bluetoothDevices.add(device)
 //                }
-                bluetoothDevices.clear()
-                listAdapter.clear()
+                //bluetoothDevices?.clear()
+                listAdapter?.clear()
                 bluetoothAdapter.startDiscovery()
 
                 val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)

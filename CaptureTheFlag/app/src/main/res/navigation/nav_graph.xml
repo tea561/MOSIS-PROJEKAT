@@ -117,7 +117,9 @@
             android:id="@+id/action_HomeFragment_to_HowToPlayFragment"
             app:destination="@id/HowToPlayFragment" />
 
-
+        <action
+            android:id="@+id/action_HomeFragment_to_BTFragment"
+            app:destination="@id/BTFragment" />
     </fragment>
 
     <fragment

@@ -19,10 +19,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.databinding.FragmentBTBinding
+import elfak.mosis.capturetheflag.databinding.FragmentGameOverBinding
 
 
 class BTFragment : Fragment() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
+    private var _binding: FragmentBTBinding? = null
+    private val binding get() = _binding!!
     private val REQUEST_ENABLE_BT = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,23 +38,20 @@ class BTFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_bluetooth, container, false)
+        _binding = FragmentBTBinding.inflate(inflater, container, false)
 
         val bluetoothManager: BluetoothManager? = ContextCompat.getSystemService(requireContext(), BluetoothManager::class.java)
         bluetoothAdapter = bluetoothManager!!.adapter
 
-        return view
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonFind: Button = requireView().findViewById(R.id.buttonFind)
-        val buttonLet: Button = requireView().findViewById(R.id.buttonLet)
-
         checkBTState()
 
-        buttonFind.setOnClickListener {
+        binding.buttonFind.setOnClickListener {
             if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled)
             {
                 checkBTState()
@@ -60,7 +61,7 @@ class BTFragment : Fragment() {
             }
         }
 
-        buttonLet.setOnClickListener {
+        binding.buttonLet.setOnClickListener {
             if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled)
             {
                 checkBTState()

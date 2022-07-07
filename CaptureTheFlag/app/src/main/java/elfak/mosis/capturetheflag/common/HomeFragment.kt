@@ -46,6 +46,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_HomeFragment_to_HowToPlayFragment)
         }
 
+        binding.buttonFindFriend.setOnClickListener {
+            findNavController().navigate(R.id.action_HomeFragment_to_BTFragment)
+        }
+
     }
 
 }

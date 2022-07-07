@@ -5,26 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".friends.BluetoothServerFragment" >
+    tools:context=".friends.BluetoothServerFragment">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="440dp"
         android:layout_height="456dp"
-        tools:src="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        tools:src="@drawable/intro1" />
 
     <Button
         android:id="@+id/buttonMakeDiscoverable"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:backgroundTint="@color/blue"
-        android:text="Button"
+        android:text="Make your device discoverable"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="20sp"
         android:textStyle="bold" />
