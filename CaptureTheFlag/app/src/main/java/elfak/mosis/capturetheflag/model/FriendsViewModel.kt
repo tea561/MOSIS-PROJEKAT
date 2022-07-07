@@ -42,10 +42,18 @@ class FriendsViewModel : ViewModel() {
                 val user = snapshot.getValue(User::class.java)
                 if(_friends.value == null)
                     _friends.value = mutableListOf()
-                if(user != null && !_friends.value!!.contains(user)) {
+                if(user != null) {
                     val list  = _friends.value
-                    list?.add(user)
+                    val m: Int? = list?.indexOfFirst { u -> u.phoneNum == user?.phoneNum }
+                    if(m != null && m != -1)
+                    {
+                            list?.set(m, user)
+                    }
+                    else {
+                        list?.add(user)
+                    }
                     _friends.value = list
+
                 }
             }
 

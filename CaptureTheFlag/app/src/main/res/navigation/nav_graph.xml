@@ -113,6 +113,10 @@
             android:id="@+id/action_HomeFragment_to_JoinGameFragment"
             app:destination="@id/JoinGameFragment" />
 
+        <action
+            android:id="@+id/action_HomeFragment_to_HowToPlayFragment"
+            app:destination="@id/HowToPlayFragment" />
+
 
     </fragment>
 
@@ -243,6 +247,39 @@
             android:id="@+id/action_ChooseTeamFragment_to_MapFragment"
             app:destination="@id/MapFragment" />
 
+    </fragment>
+
+    <fragment android:id="@+id/RiddleFragment"
+            android:name="elfak.mosis.capturetheflag.game.gameover.RiddleFragment"
+            android:label="Riddle Fragment"
+            tools:layout="@layout/fragment_riddle">
+    </fragment>
+
+    <fragment android:id="@+id/GameOverFragment"
+            android:name="elfak.mosis.capturetheflag.game.gameover.GameOverFragment"
+            android:label="Game Over Fragment"
+            tools:layout="@layout/fragment_game_over">
+    </fragment>
+
+    <fragment android:id="@+id/RankingsFragment"
+        android:name="elfak.mosis.capturetheflag.game.gameover.RankingsFragment"
+        android:label="Rankings Fragment"
+        tools:layout="@layout/fragment_rankings_list">
+
+        <action
+            android:id="@+id/action_RankingsFragment_to_BTFragment"
+            app:destination="@id/BTFragment" />
+
+        <action
+            android:id="@+id/action_RankingsFragment_to_ProfileFragment"
+            app:destination="@id/ProfileFragment" />
+
+    </fragment>
+
+    <fragment android:id="@+id/HowToPlayFragment"
+        android:name="elfak.mosis.capturetheflag.common.HowToPlayFragment"
+        android:label="How To Play Fragment"
+        tools:layout="@layout/fragment_how_to_play">
     </fragment>
 
     </navigation>

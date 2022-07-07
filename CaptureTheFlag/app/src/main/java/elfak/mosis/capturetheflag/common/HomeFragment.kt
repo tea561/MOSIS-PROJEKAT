@@ -42,6 +42,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_HomeFragment_to_JoinGameFragment)
         }
 
+        binding.buttonHowToPlay.setOnClickListener {
+            findNavController().navigate(R.id.action_HomeFragment_to_HowToPlayFragment)
+        }
+
     }
 
 }

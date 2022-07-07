@@ -61,5 +61,14 @@
     <string name="start">Start</string>
     <string name="join_game">Join Game</string>
     <string name="choose_team">Choose Team</string>
+    <string-array name="how_to_play_items">
+        <item>You</item>
+        <item>Teammate</item>
+        <item>Enemy</item>
+        <item>Team Barrier</item>
+        <item>Enemy Barrier</item>
+        <item>Team Flag</item>
+        <item>Enemy Flag</item>
+    </string-array>
 
 </resources>

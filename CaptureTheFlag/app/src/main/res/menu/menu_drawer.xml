@@ -24,7 +24,7 @@
             android:title="@string/notifications_label"></item>
 
         <item
-            android:id="@+id/rankings"
+            android:id="@+id/RankingsFragment"
             android:icon="@drawable/baseline_emoji_events_24"
             app:iconTint="@color/blue"
             android:title="@string/rankings_label"></item>

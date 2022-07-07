@@ -7,12 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResultListener
 import elfak.mosis.capturetheflag.R
-import elfak.mosis.capturetheflag.databinding.FragmentGameOverBinding
+import elfak.mosis.capturetheflag.databinding.FragmentGameCodeBinding
 import elfak.mosis.capturetheflag.databinding.FragmentRiddleBinding
 
-class GameOverFragment : Fragment() {
-
-    private var _binding: FragmentGameOverBinding? = null
+class RiddleFragment : Fragment() {
+    private var _binding: FragmentRiddleBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,15 +22,17 @@ class GameOverFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentGameOverBinding.inflate(inflater, container, false)
+        _binding = FragmentRiddleBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setFragmentResultListener("requestTitle"){requestTitle, bundle ->
-            binding.TextViewTittle.text = bundle.getString("bundleTitle")
+        setFragmentResultListener("requestText"){ requestText, bundle ->
+            binding.TextViewMessage.text = bundle.getString("bundleText")
+
         }
     }
+
 }

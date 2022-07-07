@@ -3,7 +3,7 @@ package elfak.mosis.capturetheflag.data
 import com.google.firebase.database.Exclude
 
 data class User(var firstName: String? = "", var lastName: String? = "", var phoneNum: String = "", val imgUrl: String? = "",
-                var desc: String? = "", var username: String? = "", var uid: String = "")
+                var desc: String? = "", var username: String? = "", var uid: String = "", var rank: Int = 0)
 {
     @Exclude
     fun toMap(): Map<String, Any?> {
@@ -14,7 +14,8 @@ data class User(var firstName: String? = "", var lastName: String? = "", var pho
             "username" to username,
             "desc" to desc,
             "imgUrl" to imgUrl,
-            "uid" to uid
+            "uid" to uid,
+            "rank" to rank
 
         )
     }

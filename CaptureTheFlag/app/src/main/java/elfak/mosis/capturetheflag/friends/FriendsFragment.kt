@@ -67,21 +67,6 @@ class FriendsFragment : Fragment() {
         Log.i("CLICK ON FRIEND", user.username ?: "empty")
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        val recyclerView = view.findViewById(R.id.recyclerViewFriendsList) as RecyclerView
-//        val emptyView = view.findViewById(R.id.linearLayoutEmptyList) as LinearLayout
-//        if(recyclerView.adapter?.itemCount == 0)
-//        {
-//            recyclerView.visibility = View.GONE
-//            emptyView.visibility = View.VISIBLE
-//        }
-//        else{
-//            recyclerView.visibility = View.VISIBLE
-//            emptyView.visibility = View.GONE
-//        }
-//    }
-
     companion object {
 
         // TODO: Customize parameter argument names

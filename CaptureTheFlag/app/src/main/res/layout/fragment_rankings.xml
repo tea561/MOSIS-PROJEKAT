@@ -16,7 +16,7 @@
 
         <ImageView
             android:id="@+id/imageViewFriend"
-            android:layout_width="match_parent"
+            android:layout_width="63dp"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             tools:src="@tools:sample/avatars" />
@@ -48,8 +48,20 @@
 
 
     <Space
-        android:layout_width="128dp"
+        android:layout_width="100dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/buttonRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="18dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/green"
+        android:enabled="false"
+        android:text="1500"
+        android:textSize="16sp" />
 
 </LinearLayout>
