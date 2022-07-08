@@ -107,6 +107,25 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                 }
             }
         })
+
+    }
+
+    fun setFriends(friendsList: List<User>) {
+
+        Log.i("MAPS VM", "Friends setting now... List with ${friendsList.count()}")
+
+        friendsList.forEach { user ->
+            Log.i("MAPS VM", "Friends setting now... Friend with ${user.username}")
+            val uid = user.uid
+            val userWithLocation = UserWithLocation(user, null)
+            _friends.value!![uid] = userWithLocation
+        }
+        if (friendsList.isNotEmpty()) {
+            getFriendLocations()
+        }
+    }
+
+    private fun getFriendLocations() {
         dbRef.child("locations").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 friendLocationHandler(snapshot)
@@ -132,25 +151,6 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         })
     }
 
-    fun setFriends(friendsList: List<User>) {
-
-        Log.i("MAPS VM", "Friends setting now... List with ${friendsList.count()}")
-
-        friendsList.forEach { user ->
-            Log.i("MAPS VM", "Friends setting now... Friend with ${user.username}")
-            val uid = user.uid
-            val userWithLocation = UserWithLocation(user, null)
-            _friends.value!![uid] = userWithLocation
-        }
-        //getFriendLocations(friendsList)
-    }
-
-    private fun getFriendLocations(friendsList: List<User>) {
-        friendsList.forEach { user ->
-            subscribeToFriendLocationInDB(user.uid)
-        }
-    }
-
     private fun friendLocationHandler(snapshot: DataSnapshot) {
         val userUid = snapshot.key
         Log.i("MAPS VM Friend Location Handler", userUid!!)
@@ -164,7 +164,7 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         }
     }
 
-    private fun subscribeToFriendLocationInDB(friendID: String) {
+    /*private fun subscribeToFriendLocationInDB(friendID: String) {
         dbRef.child("locations").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
                 Log.e("MAP", error.message)
@@ -188,7 +188,7 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                 }
             }
         })
-    }
+    }*/
 }
 
 class MapViewModelFactory(private val app: Application, private val uid: String) :

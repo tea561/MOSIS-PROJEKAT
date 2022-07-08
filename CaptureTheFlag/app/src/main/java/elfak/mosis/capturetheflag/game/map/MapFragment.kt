@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
@@ -44,6 +45,7 @@ class MapFragment : Fragment() {
     private val userViewModel: UserViewModel by activityViewModels()
     private val friendsViewModel: FriendsViewModel by activityViewModels()
     private val gameViewModel: GameViewModel by activityViewModels()
+    private val markerViewModel: MarkerViewModel by viewModels()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -59,6 +61,7 @@ class MapFragment : Fragment() {
         mapViewModel = ViewModelProvider(requireActivity(),
             MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
+        markerViewModel.getFriendsWithLocations()
     }
 
     override fun onCreateView(
@@ -267,7 +270,7 @@ class MapFragment : Fragment() {
         val friendsWithLocationsObserver = Observer<MutableMap<String, UserWithLocation>> { state ->
             setUserWithLocationsObserver(state)
         }
-        mapViewModel.friends.observe(viewLifecycleOwner, friendsWithLocationsObserver)
+        markerViewModel.friendsWithLocations.observe(viewLifecycleOwner, friendsWithLocationsObserver)
     }
 
     private fun setFriendsObserver(friendsList: MutableList<User>) {
