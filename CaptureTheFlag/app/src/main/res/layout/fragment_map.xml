@@ -8,9 +8,10 @@
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
+        tilesource="Mapnik"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tilesource="Mapnik" >
+        android:layout_height="match_parent">
+
     </org.osmdroid.views.MapView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -27,6 +28,22 @@
         app:fabSize="mini"
         app:rippleColor="@color/blue"
         app:srcCompat="@drawable/sharp_edit_24"
+        app:tint="@android:color/white" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/blue"
+        android:clickable="true"
+        android:foregroundTint="@color/white"
+        android:tint="@color/white"
+        app:backgroundTint="@color/gray_dark"
+        app:fabSize="mini"
+        app:rippleColor="@color/blue"
+        app:srcCompat="@drawable/baseline_pin_drop_24"
         app:tint="@android:color/white" />
 
 </FrameLayout>

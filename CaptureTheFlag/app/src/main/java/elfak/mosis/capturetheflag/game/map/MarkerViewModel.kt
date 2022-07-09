@@ -24,15 +24,18 @@ class MarkerViewModel : ViewModel() {
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
-    private var _friendsReady = MutableLiveData<Boolean>()
-    val friendsReady: LiveData<Boolean> = _friendsReady
-
     private var _friendsWithLocations = MutableLiveData<MutableMap<String, UserWithLocation>>()
     val friendsWithLocations: LiveData<MutableMap<String, UserWithLocation>> = _friendsWithLocations
 
+    private var _filters = MutableLiveData<MutableMap<String, Boolean>>()
+    val filters: LiveData<MutableMap<String, Boolean>> = _filters
+
     init {
-        _friendsWithLocations.value = mutableMapOf<String, UserWithLocation>()
-        _friendsReady.value = false
+        _filters.value = mutableMapOf(
+            "Friends" to true, "Players" to true,
+            "Team Barriers" to true, "Enemy Barriers" to true,
+            "Team Flag" to true, "Enemy Flag" to true)
+        _friendsWithLocations.value = mutableMapOf()
     }
 
     fun getFriendsWithLocations() {
@@ -43,14 +46,10 @@ class MarkerViewModel : ViewModel() {
                 val value = dataSnapshot.getValue<Boolean>()
                 val key = dataSnapshot.key
                 Log.i("onChildAdded", "${value.toString()} key: $key")
-
                 val friendList = _friendsWithLocations.value
                 friendList!![key!!] = UserWithLocation()
                 _friendsWithLocations.value = friendList
-
                 getFriendFromDB(key)
-
-
             }
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
@@ -75,6 +74,10 @@ class MarkerViewModel : ViewModel() {
             }
         }
         dbRef.child("friends").child(userUid).addChildEventListener(childEventListener)
+    }
+
+    fun setFilters(newFilters: MutableMap<String, Boolean>) {
+        _filters.value = newFilters
     }
 
     private fun getFriendFromDB(key: String) {
@@ -111,7 +114,6 @@ class MarkerViewModel : ViewModel() {
                     val friendsList  = _friendsWithLocations.value
                     friendsList!![key]!!.location = location
                     _friendsWithLocations.value = friendsList
-                    _friendsReady.value = true
                 }
             }
 

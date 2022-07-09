@@ -71,4 +71,17 @@
         <item>Enemy Flag</item>
     </string-array>
 
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <string-array name="map_filters">
+        <item>Friends</item>
+        <item>Players</item>
+        <item>Team Barriers</item>
+        <item>Enemy Barriers</item>
+        <item>Team Flag</item>
+        <item>Enemy Flag</item>
+    </string-array>
+
+
 </resources>
