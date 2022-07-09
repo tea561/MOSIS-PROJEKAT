@@ -117,8 +117,10 @@ class MapFragment : Fragment() {
         val locationProvider = GpsMyLocationProvider(activity)
         val myLocationOverlay = MyLocationNewOverlay(locationProvider, map)
         myLocationOverlay.enableMyLocation()
-        myLocationOverlay.enableFollowLocation()
+
         map.overlays.add(myLocationOverlay)
+        myLocationOverlay.enableFollowLocation()
+        map.controller.setCenter(myLocationOverlay.myLocation)
     }
 
     private fun setObservers() {

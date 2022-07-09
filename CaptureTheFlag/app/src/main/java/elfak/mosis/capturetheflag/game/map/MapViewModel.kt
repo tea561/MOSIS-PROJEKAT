@@ -83,24 +83,6 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                         Log.i("MAPS", "Location: ${location.latitude}, ${location.longitude}")
                         _userLocation.value = location
                     }
-
-                    /* ovde sam prckala posto kad se startuje uopste ne poziva child handlere
-                    * nego samo ostavi, ili sam ja glupa i corava i nisam videla a vrlo je verovatno
-                    * da sam samo glupa i corava. nek mi pokoj dusi... */
-
-                    _friends.value!!.forEach { (friendUid, userWithLocation) ->
-                        val friendLocation = snapshot.child(friendUid).getValue(FirebaseLocation::class.java)
-                        if (friendLocation == null) {
-                            Log.i("MAPS", "Location not set yet.")
-                            dbRef.child("locations").child(uid).setValue("")
-                        }
-                        else {
-                            Log.i("MAPS", "Location: ${friendLocation.latitude}, ${friendLocation.longitude}")
-                            val friendsMap = _friends.value
-                            friendsMap!![friendUid]!!.location = friendLocation
-                            _friends.value = friendsMap
-                        }
-                    }
                 }
                 catch(e: DatabaseException) {
                     dbRef.child("locations").child(uid).setValue("")

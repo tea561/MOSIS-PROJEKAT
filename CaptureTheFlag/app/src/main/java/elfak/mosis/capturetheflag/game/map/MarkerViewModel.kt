@@ -53,7 +53,12 @@ class MarkerViewModel : ViewModel() {
             }
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
-
+                val value = dataSnapshot.getValue<Boolean>()
+                val key = dataSnapshot.key
+                val friendList = _friendsWithLocations.value
+                friendList!![key!!] = UserWithLocation()
+                _friendsWithLocations.value = friendList
+                getFriendFromDB(key)
                 //TODO:Not implemented yet
             }
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
@@ -122,6 +127,6 @@ class MarkerViewModel : ViewModel() {
             }
 
         }
-        ref.addListenerForSingleValueEvent(valueEventListener)
+        ref.addValueEventListener(valueEventListener)
     }
 }
