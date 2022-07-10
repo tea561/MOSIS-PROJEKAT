@@ -15,9 +15,11 @@ import elfak.mosis.capturetheflag.data.UserWithLocation
 import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 
-class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsReceiver {
+class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsReceiver, Marker.OnMarkerClickListener {
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
@@ -27,8 +29,6 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
 
     private var _mapState = MutableLiveData<MapState>()
     var mapState: LiveData<MapState> = _mapState
-
-    var mapFilters = MapFilters()
 
     private var _friends = MutableLiveData<MutableMap<String,UserWithLocation>>()
     var friends: LiveData<MutableMap<String,UserWithLocation>> = _friends
@@ -48,23 +48,29 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         _mapState.value = MapState.PlacingMarker(type)
     }
 
+    fun setCooldownMapState(cooldownTime: Int) {
+        _mapState.value = MapState.Cooldown(cooldownTime)
+    }
+
     fun setMapState(state: MapState) {
         _mapState.value = state
     }
 
     override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+        Log.d("singleTapConfirmedHelper", "single tap on map pap ha")
         if (_mapState.value is MapState.PlacingMarker) {
             val state = _mapState.value as MapState.PlacingMarker
-            Log.d("singleTapConfirmedHelper", state.type)
             _mapState.value = MapState.ConfirmingMarker(state.type, p!!.latitude, p.longitude)
+        }
+        else if (_mapState.value is MapState.PlacingFlag) {
+            _mapState.value = MapState.ConfirmingFlag(p!!.latitude, p.longitude)
         }
         return true
     }
 
     override fun longPressHelper(p: GeoPoint?): Boolean {
-        //TODO: open filter menu
         Log.d("longPressHelper", "${p?.latitude} - ${p?.longitude}")
-        return false
+        return true
     }
 
     private fun subscribeToLocationsInDB() {
@@ -89,88 +95,11 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                 }
             }
         })
-
     }
 
-    fun setFriends(friendsList: List<User>) {
-
-        Log.i("MAPS VM", "Friends setting now... List with ${friendsList.count()}")
-
-        friendsList.forEach { user ->
-            Log.i("MAPS VM", "Friends setting now... Friend with ${user.username}")
-            val uid = user.uid
-            val userWithLocation = UserWithLocation(user, null)
-            _friends.value!![uid] = userWithLocation
-        }
-        if (friendsList.isNotEmpty()) {
-            getFriendLocations()
-        }
+    override fun onMarkerClick(marker: Marker?, mapView: MapView?): Boolean {
+        return false
     }
-
-    private fun getFriendLocations() {
-        dbRef.child("locations").addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                friendLocationHandler(snapshot)
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-                friendLocationHandler(snapshot)
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                friendLocationHandler(snapshot)
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                friendLocationHandler(snapshot)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("MAPS", error.message)
-            }
-
-        })
-    }
-
-    private fun friendLocationHandler(snapshot: DataSnapshot) {
-        val userUid = snapshot.key
-        Log.i("MAPS VM Friend Location Handler", userUid!!)
-        if (_friends.value!!.containsKey(userUid)) {
-            // this is a friend and should be stored in friends array
-            val location = snapshot.getValue(FirebaseLocation::class.java)
-            Log.i("MAPS VM", "A FRIEND HAS APPEARED! $userUid with lat: ${location!!.latitude} and long: ${location.longitude}")
-            val friendsMap = _friends.value
-            friendsMap!![uid]!!.location = location
-            _friends.value = friendsMap
-        }
-    }
-
-    /*private fun subscribeToFriendLocationInDB(friendID: String) {
-        dbRef.child("locations").addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("MAP", error.message)
-            }
-            override fun onDataChange(snapshot: DataSnapshot) {
-                try {
-                    val friendLocation = snapshot.child(friendID).getValue(FirebaseLocation::class.java)
-                    if (friendLocation == null) {
-                        Log.i("MAPS", "Location not set yet.")
-                        dbRef.child("locations").child(friendID).setValue("")
-                    }
-                    else {
-                        Log.i("MAPS", "Location: ${friendLocation.latitude}, ${friendLocation.longitude}")
-                        val list = _friends.value
-                        list!![friendID]?.location = friendLocation
-                        _friends.value = list
-                    }
-                }
-                catch(e: DatabaseException) {
-                    dbRef.child("locations").child(friendID).setValue("")
-                }
-            }
-        })
-    }*/
 }
 
 class MapViewModelFactory(private val app: Application, private val uid: String) :
@@ -183,11 +112,17 @@ class MapViewModelFactory(private val app: Application, private val uid: String)
 sealed class MapState {
     object Idle: MapState()
     class InGame(val gameId: String): MapState()
-    class Cooldown(val timespan: Number = 120): MapState()
+    class Cooldown(val time: Number = 120): MapState()
     class PlacingMarker(val type: String = "") : MapState()
     class ConfirmingMarker(val type: String = "", val latitude: Double, val longitude: Double) : MapState()
+    object BeginGame: MapState()
+    object PlacingFlag: MapState()
+    class ConfirmingFlag(val latitude: Double, val longitude: Double) : MapState()
+    object WaitingForFlags: MapState()
+    object SolvingRiddle: MapState()
 }
 
+/*
 class MapFilters {
     val friends = MutableLiveData<Boolean>()
     val players = MutableLiveData<Boolean>()
@@ -204,4 +139,4 @@ class MapFilters {
         enemyBarriers.value = true
         enemyFlag.value = true
     }
-}
+}*/

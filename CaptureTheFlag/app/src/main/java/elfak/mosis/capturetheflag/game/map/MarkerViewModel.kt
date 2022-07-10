@@ -43,39 +43,20 @@ class MarkerViewModel : ViewModel() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
-                val value = dataSnapshot.getValue<Boolean>()
-                val key = dataSnapshot.key
-                Log.i("onChildAdded", "${value.toString()} key: $key")
-                val friendList = _friendsWithLocations.value
-                friendList!![key!!] = UserWithLocation()
-                _friendsWithLocations.value = friendList
-                getFriendFromDB(key)
+                onChildDB(dataSnapshot, previousChildName)
             }
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
-                val value = dataSnapshot.getValue<Boolean>()
-                val key = dataSnapshot.key
-                val friendList = _friendsWithLocations.value
-                friendList!![key!!] = UserWithLocation()
-                _friendsWithLocations.value = friendList
-                getFriendFromDB(key)
-                //TODO:Not implemented yet
+                onChildDB(dataSnapshot, previousChildName)
             }
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
-
-                //TODO:Not implemented yet
             }
             override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildMoved:" + dataSnapshot.key!!)
-
-                //TODO:Not implemented yet
-
-                // ...
             }
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.w(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
-                //TODO:Not implemented yet
             }
         }
         dbRef.child("friends").child(userUid).addChildEventListener(childEventListener)
@@ -83,6 +64,14 @@ class MarkerViewModel : ViewModel() {
 
     fun setFilters(newFilters: MutableMap<String, Boolean>) {
         _filters.value = newFilters
+    }
+
+    private fun onChildDB(dataSnapshot: DataSnapshot, previousChildName: String?) {
+        val key = dataSnapshot.key
+        val friendList = _friendsWithLocations.value
+        friendList!![key!!] = UserWithLocation()
+        _friendsWithLocations.value = friendList
+        getFriendFromDB(key)
     }
 
     private fun getFriendFromDB(key: String) {

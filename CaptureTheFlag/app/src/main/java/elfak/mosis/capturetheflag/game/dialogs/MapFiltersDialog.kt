@@ -1,4 +1,4 @@
-package elfak.mosis.capturetheflag.game.map
+package elfak.mosis.capturetheflag.game.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.game.map.MarkerViewModel
 
 class MapFiltersDialog : DialogFragment() {
 

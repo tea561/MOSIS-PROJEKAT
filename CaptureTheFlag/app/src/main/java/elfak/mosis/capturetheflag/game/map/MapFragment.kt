@@ -5,27 +5,40 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.data.UserWithLocation
+import elfak.mosis.capturetheflag.game.dialogs.MapFiltersDialog
+import elfak.mosis.capturetheflag.game.dialogs.PlaceFlagDialog
+import elfak.mosis.capturetheflag.game.dialogs.WaitForFlagDialog
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
+import elfak.mosis.capturetheflag.utils.extensions.FriendInfoWindow
+import elfak.mosis.capturetheflag.utils.extensions.FriendMarker
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import org.osmdroid.config.Configuration
@@ -33,8 +46,11 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.lang.Exception
+import java.util.concurrent.Executors
 
 
 class MapFragment : Fragment() {
@@ -104,12 +120,24 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         map.onPause()
+        removeObservers()
     }
 
     override fun onResume() {
         super.onResume()
         map.onResume()
+        setObservers()
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        removeObservers()
+    }
+
+    fun openFriendProfile(user: User){
+        setFragmentResult("requestFriend", bundleOf("bundleFriend" to user.uid))
+        findNavController().navigate(R.id.action_MapFragment_to_ProfileFragment)
+        Log.i("CLICK ON FRIEND", user.username ?: "empty")
     }
 
     @SuppressLint("MissingPermission")
@@ -136,6 +164,13 @@ class MapFragment : Fragment() {
             setFiltersObserver(state)
         }
         markerViewModel.filters.observe(viewLifecycleOwner, filtersObserver)
+    }
+
+    private fun removeObservers() {
+        gameViewModel.gameState.removeObservers(viewLifecycleOwner)
+        mapViewModel.mapState.removeObservers(viewLifecycleOwner)
+        markerViewModel.friendsWithLocations.removeObservers(viewLifecycleOwner)
+        markerViewModel.filters.removeObservers(viewLifecycleOwner)
     }
 
     private fun checkLocationServiceRunning(): Boolean {
@@ -206,65 +241,11 @@ class MapFragment : Fragment() {
         dialog.show(activity!!.supportFragmentManager, "MapFiltersDialog")
     }
 
-    private fun setMapStateObserver(state: MapState) {
-        val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
-        if (state is MapState.ConfirmingMarker) {
-            fab.show()
-            mapObserverConfirmingMarker(state)
-        }
-        if (state is MapState.Idle) {
-            fab.hide()
-        }
-        if (state is MapState.InGame) {
-            //TODO: get info about game if not present
-            fab.show()
-        }
-        if (state is MapState.PlacingMarker) {
-            //TODO: idk dal treba nesto
-            fab.show()
-        }
-        if (state is MapState.Cooldown) {
-            //TODO: display border on map and cooldown bottom sheet
-            fab.hide()
-        }
-    }
-
-    private fun mapObserverConfirmingMarker(state: MapState.ConfirmingMarker) {
-        val marker = Marker(map)
-        marker.position = GeoPoint(state.latitude, state.longitude)
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        marker.icon = resolveMapIcon(state.type)
-        map.overlays.add(marker)
-
-        val dialog = BottomSheetDialog(requireContext())
-        dialog.setCancelable(false)
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
-        val btnAccept = view.findViewById<Button>(R.id.btnAccept)
-        btnAccept.setOnClickListener {
-            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.teamNumber, state.latitude, state.longitude)
-
-            dialog.dismiss()
-            Toast.makeText(
-                requireContext(),
-                "${state.type}, lat: ${state.latitude}, long: ${state.longitude}",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        val btnCancel = view.findViewById<Button>(R.id.btnCancel)
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-            Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
-            map.overlays.remove(marker)
-        }
-        dialog.setContentView(view)
-        dialog.show()
-    }
-
     private fun initMapView() {
         val ctx: Context? = activity?.applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
         map = requireView().findViewById(R.id.map)
+
 
         if (ActivityCompat.checkSelfPermission(
                 requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -286,6 +267,120 @@ class MapFragment : Fragment() {
         map.overlays.add(mapEventsOverlay)
     }
 
+    private fun setMapStateObserver(state: MapState) {
+        val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
+        val fabFilters = requireView().findViewById<FloatingActionButton>(R.id.fabFilters)
+
+        when (state) {
+            is MapState.ConfirmingMarker -> {
+                fab.show()
+                fabFilters.hide()
+                mapObserverConfirmingMarker(state)
+            }
+            is MapState.Idle -> {
+                fab.hide()
+                fabFilters.show()
+            }
+            is MapState.InGame -> {
+                //TODO: get info about game if not present
+                fab.show()
+                fabFilters.show()
+            }
+            is MapState.PlacingMarker -> {
+                //TODO: idk dal treba nesto
+                fab.hide()
+                fabFilters.hide()
+            }
+            is MapState.Cooldown -> {
+                //TODO: display border on map and cooldown bottom sheet
+                fab.hide()
+                fabFilters.show()
+            }
+            is MapState.BeginGame -> {
+                if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
+                    val dialog = WaitForFlagDialog()
+                    dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
+                }
+                else {
+                    val dialog = PlaceFlagDialog()
+                    dialog.show(activity!!.supportFragmentManager, "PlaceFlagDialog")
+                }
+            }
+            is MapState.PlacingFlag -> {
+                fab.hide()
+                fabFilters.hide()
+            }
+            else -> {
+                //TODO
+            }
+        }
+    }
+
+    private fun mapObserverConfirmingMarker(state: MapState.ConfirmingMarker) {
+        val marker = Marker(map)
+        marker.position = GeoPoint(state.latitude, state.longitude)
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        marker.icon = resolveMapIcon(state.type)
+        map.overlays.add(marker)
+
+
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setCancelable(false)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
+        val btnAccept = view.findViewById<Button>(R.id.btnAccept)
+        btnAccept.setOnClickListener {
+            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.team, state.latitude, state.longitude)
+
+            dialog.dismiss()
+            Toast.makeText(
+                requireContext(),
+                "${state.type}, lat: ${state.latitude}, long: ${state.longitude}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        val btnCancel = view.findViewById<Button>(R.id.btnCancel)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
+            map.overlays.remove(marker)
+        }
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    private fun mapObserverConfirmingFlag(state: MapState.ConfirmingFlag) {
+        val marker = Marker(map)
+        marker.position = GeoPoint(state.latitude, state.longitude)
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        marker.icon = context!!.getDrawable(R.drawable.ic_flag_solid)
+        map.overlays.add(marker)
+
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setCancelable(false)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
+        val btnAccept = view.findViewById<Button>(R.id.btnAccept)
+        btnAccept.setOnClickListener {
+            //gameViewModel.putGameObjectToDB(gameViewModel.gameUid, "flag", gameViewModel.team, state.latitude, state.longitude)
+
+            dialog.dismiss()
+            Toast.makeText(
+                requireContext(),
+                "flag, lat: ${state.latitude}, long: ${state.longitude}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        val btnCancel = view.findViewById<Button>(R.id.btnCancel)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
+            map.overlays.remove(marker)
+        }
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
     private fun setUserWithLocationsObserver(state: MutableMap<String, UserWithLocation>) {
         if (markerViewModel.filters.value?.get("Friends") == true) {
             drawFriends(state)
@@ -304,11 +399,13 @@ class MapFragment : Fragment() {
             friendsMarkers.clear()
         }
     }
+
     private fun drawFriends(friends: MutableMap<String, UserWithLocation>) {
         friendsMarkers.forEach { marker ->
             map.overlays.remove(marker)
         }
         friendsMarkers.clear()
+
         friends.forEach { (uid, user) ->
             if (user.location != null) {
                 val marker = Marker(map)
@@ -316,6 +413,24 @@ class MapFragment : Fragment() {
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                 marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
                 marker.icon.setTint(R.color.blue)
+                //marker.setOnMarkerClickListener(mapViewModel)
+                val executor = Executors.newSingleThreadExecutor()
+                var image: Bitmap? = null
+                executor.execute{
+                    val imageUrl = user.user.imgUrl
+                    try {
+                        val `in` = java.net.URL(imageUrl).openStream()
+                        image = BitmapFactory.decodeStream(`in`)
+                        val handler = Handler(Looper.getMainLooper())
+                        handler.post{
+                            marker.image = image?.toDrawable(resources)
+                        }
+                    }
+                    catch(e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+
                 friendsMarkers.add(marker)
                 map.overlays.add(marker)
             }

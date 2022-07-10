@@ -16,6 +16,7 @@ import elfak.mosis.capturetheflag.game.map.MapState
 import elfak.mosis.capturetheflag.game.map.MapViewModel
 import elfak.mosis.capturetheflag.game.map.MapViewModelFactory
 import elfak.mosis.capturetheflag.game.viewmodel.FindGameState
+import elfak.mosis.capturetheflag.game.viewmodel.GameState
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 
@@ -48,8 +49,8 @@ class ChooseTeamFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.buttonTeam1.text = gameViewModel.team1name
-        binding.buttonTeam2.text = gameViewModel.team2name
+        binding.buttonTeam1.text = gameViewModel.teams["team1"]!!.teamName
+        binding.buttonTeam2.text = gameViewModel.teams["team2"]!!.teamName
 
         binding.buttonTeam1.setOnClickListener{
             userViewModel.selectedUser?.let { it1 -> gameViewModel.addPlayerToGame(it1.uid, 1) }
@@ -82,7 +83,7 @@ class ChooseTeamFragment : Fragment() {
     }
 
     private fun navigateToMapFragment() {
-        mapViewModel.setMapState(MapState.InGame(gameViewModel.gameUid))
+        mapViewModel.setMapState(MapState.BeginGame)
         findNavController().navigate(R.id.action_ChooseTeamFragment_to_MapFragment)
     }
 
