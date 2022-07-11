@@ -84,7 +84,7 @@ class LocationService : Service(), LocationListener {
                 Log.i("LOCATION", "Location Service is running in the background.")
 
         }.start()
-        
+
         val prefs = PreferenceHelper.customPreference(this, "User_data")
         userID = prefs.userId
         gameID = prefs.gameID

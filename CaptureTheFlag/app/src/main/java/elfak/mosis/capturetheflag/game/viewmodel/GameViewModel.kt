@@ -17,6 +17,7 @@ import com.google.firebase.storage.ktx.storage
 import elfak.mosis.capturetheflag.data.GameTeam
 import elfak.mosis.capturetheflag.data.MapObject
 import elfak.mosis.capturetheflag.model.StoreUploadState
+import elfak.mosis.capturetheflag.utils.enums.MapFilters
 import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -146,7 +147,7 @@ class GameViewModel : ViewModel() {
             .child(uniqueID).setValue(mapObject)
             .addOnSuccessListener {
                 Log.i("GAME", "Object of type $objectType inserted into DB with uid: $uniqueID .")
-                if(objectType == "TeamFlag")
+                if(objectType == MapFilters.TeamFlag.value)
                 {
                     dbRef.child("games").child(gameUid).child("flagCount").get().addOnSuccessListener {
                         val count = it.value as Int

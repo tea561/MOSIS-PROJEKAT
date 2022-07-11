@@ -186,22 +186,22 @@ class MapFragment : Fragment() {
     }
 
     private fun resolveMapIcon(type: String) : Drawable? {
-        if (type == "TeamBarrier") {
+        if (type == MapFilters.TeamBarriers.value) {
             return context!!.getDrawable(R.drawable.ic_road_barrier_solid)
         }
-        if (type == "EnemyBarrier") {
+        if (type == MapFilters.EnemyBarriers.value) {
             return context!!.getDrawable(R.drawable.ic_burst_solid)
         }
-        if (type == "EnemyFlag") {
+        if (type == MapFilters.EnemyFlag.value) {
             return context!!.getDrawable(R.drawable.ic_location_crosshairs_solid)
         }
         return null
     }
     private fun resolveIconColor(type: String) : Int {
-        if (type == "TeamBarrier") {
+        if (type == MapFilters.TeamBarriers.value) {
             return R.color.blue
         }
-        if (type == "EnemyBarrier" || type== "EnemyFlag") {
+        if (type == MapFilters.EnemyBarriers.value || type== MapFilters.EnemyFlag.value) {
             return R.color.red_enemy
         }
         return R.color.black
@@ -213,17 +213,17 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
         val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
         btnBarrier.setOnClickListener {
-            openSetMarkerBottomSheet(dialog, "TeamBarrier")
+            openSetMarkerBottomSheet(dialog, MapFilters.TeamBarriers.value)
         }
 
         val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
         btnEnemyBarrier.setOnClickListener {
-            openSetMarkerBottomSheet(dialog, "EnemyBarrier")
+            openSetMarkerBottomSheet(dialog, MapFilters.EnemyBarriers.value)
         }
 
         val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
         btnEnemyFlag.setOnClickListener {
-            openSetMarkerBottomSheet(dialog, "EnemyFlag")
+            openSetMarkerBottomSheet(dialog, MapFilters.EnemyFlag.value)
         }
 
         dialog.setContentView(view)
@@ -365,7 +365,7 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
-            gameViewModel.objectType = "TeamFlag"
+            gameViewModel.objectType = MapFilters.TeamFlag.value
             gameViewModel.objectLatitude = state.latitude
             gameViewModel.objectLongitude = state.longitude
             mapViewModel.setMapState(MapState.WaitingForFlags)

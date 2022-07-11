@@ -13,6 +13,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.data.MapObject
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.data.UserWithLocation
 import elfak.mosis.capturetheflag.utils.enums.MapFilters
@@ -44,11 +45,11 @@ class MarkerViewModel : ViewModel() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
-                onChildDB(dataSnapshot, previousChildName)
+                onChildDBFriends(dataSnapshot, previousChildName)
             }
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
-                onChildDB(dataSnapshot, previousChildName)
+                onChildDBFriends(dataSnapshot, previousChildName)
             }
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
@@ -63,16 +64,48 @@ class MarkerViewModel : ViewModel() {
         dbRef.child("friends").child(userUid).addChildEventListener(childEventListener)
     }
 
+    fun getGameObjects(gameUid: String, team: String) {
+        val childEventListener = object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
+
+            }
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
+
+            }
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
+            }
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(ContentValues.TAG, "onChildMoved:" + dataSnapshot.key!!)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
+            }
+        }
+        dbRef.child("games").child(gameUid).child("objects").addChildEventListener(childEventListener)
+    }
+
     fun setFilters(newFilters: MutableMap<String, Boolean>) {
         _filters.value = newFilters
     }
 
-    private fun onChildDB(dataSnapshot: DataSnapshot, previousChildName: String?) {
+    private fun onChildDBFriends(dataSnapshot: DataSnapshot, previousChildName: String?) {
         val key = dataSnapshot.key
         val friendList = _friendsWithLocations.value
         friendList!![key!!] = UserWithLocation()
         _friendsWithLocations.value = friendList
         getFriendFromDB(key)
+    }
+
+    private fun onChildDBGameObjects(dataSnapshot: DataSnapshot, previousChildName: String?) {
+        val key = dataSnapshot.key
+        val gameObject = dataSnapshot.value as MapObject
+
+        when (gameObject.type) {
+
+        }
     }
 
     private fun getFriendFromDB(key: String) {
