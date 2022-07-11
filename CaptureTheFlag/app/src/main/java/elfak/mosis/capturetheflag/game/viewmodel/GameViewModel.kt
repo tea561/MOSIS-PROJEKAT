@@ -133,7 +133,7 @@ class GameViewModel : ViewModel() {
         //TODO: put to DB
         val uniqueID: String = UUID.randomUUID().toString()
         val timestamp = System.currentTimeMillis()
-        val mapObject = MapObject(uniqueID, lat, long, type, timestamp)
+        val mapObject = MapObject(uniqueID, lat, long, type, timestamp, "", "", team)
         dbRef.child("games").child(gameUid)
             .child(team)
             .child("objects")

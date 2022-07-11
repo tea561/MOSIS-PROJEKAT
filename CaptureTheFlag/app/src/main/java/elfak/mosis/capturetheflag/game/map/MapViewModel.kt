@@ -33,6 +33,8 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
     private var _friends = MutableLiveData<MutableMap<String,UserWithLocation>>()
     var friends: LiveData<MutableMap<String,UserWithLocation>> = _friends
 
+    var gameBeginning = true
+
     init {
         _friends.value = mutableMapOf()
         subscribeToLocationsInDB()

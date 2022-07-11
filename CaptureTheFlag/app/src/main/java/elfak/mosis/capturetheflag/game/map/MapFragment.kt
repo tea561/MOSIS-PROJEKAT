@@ -110,13 +110,13 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         map.onPause()
-        removeObservers()
+        //removeObservers()
     }
 
     override fun onResume() {
         super.onResume()
         map.onResume()
-        setObservers()
+        //setObservers()
     }
 
     override fun onDestroyView() {
@@ -281,24 +281,29 @@ class MapFragment : Fragment() {
                 fab.hide()
                 fabFilters.hide()
             }
-            is MapState.Cooldown -> {
-                //TODO: display border on map and cooldown bottom sheet
-                fab.hide()
-                fabFilters.show()
-            }
             is MapState.BeginGame -> {
-                if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
-                    val dialog = WaitForFlagDialog()
-                    dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
-                }
-                else {
-                    val dialog = PlaceFlagDialog()
-                    dialog.show(activity!!.supportFragmentManager, "PlaceFlagDialog")
-                }
+                    if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
+                        val dialog = WaitForFlagDialog()
+                        dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
+                    }
+                    else {
+                        val dialog = PlaceFlagDialog()
+                        dialog.show(activity!!.supportFragmentManager, "PlaceFlagDialog")
+                    }
             }
+
             is MapState.PlacingFlag -> {
                 fab.hide()
                 fabFilters.hide()
+            }
+            is MapState.ConfirmingFlag -> {
+                fab.show()
+                fabFilters.hide()
+                mapObserverConfirmingFlag(state)
+            }
+            is MapState.WaitingForFlags -> {
+                fab.hide()
+                fabFilters.show()
             }
             else -> {
                 //TODO
@@ -311,6 +316,7 @@ class MapFragment : Fragment() {
         marker.position = GeoPoint(state.latitude, state.longitude)
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.icon = resolveMapIcon(state.type)
+        marker.setInfoWindow(null)
         map.overlays.add(marker)
 
 
@@ -344,6 +350,7 @@ class MapFragment : Fragment() {
         marker.position = GeoPoint(state.latitude, state.longitude)
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.icon = context!!.getDrawable(R.drawable.ic_flag_solid)
+        marker.setInfoWindow(null)
         map.overlays.add(marker)
 
         val dialog = BottomSheetDialog(requireContext())
@@ -351,8 +358,8 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
-            //gameViewModel.putGameObjectToDB(gameViewModel.gameUid, "flag", gameViewModel.team, state.latitude, state.longitude)
-
+            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, "flag", gameViewModel.team, state.latitude, state.longitude)
+            mapViewModel.setMapState(MapState.WaitingForFlags)
             dialog.dismiss()
             Toast.makeText(
                 requireContext(),

@@ -53,13 +53,18 @@ class ChooseTeamFragment : Fragment() {
         binding.buttonTeam2.text = gameViewModel.teams["team2"]!!.teamName
 
         binding.buttonTeam1.setOnClickListener{
-            userViewModel.selectedUser?.let { it1 -> gameViewModel.addPlayerToGame(it1.uid, 1) }
-            navigateToMapFragment()
+            userViewModel.selectedUser?.let { it1 ->
+                gameViewModel.addPlayerToGame(it1.uid, 1)
+                navigateToMapFragment()
+            }
         }
 
         binding.buttonTeam2.setOnClickListener{
-            userViewModel.selectedUser?.let { it2 -> gameViewModel.addPlayerToGame(it2.uid, 2)}
-            navigateToMapFragment()
+            userViewModel.selectedUser?.let { it2 ->
+                gameViewModel.addPlayerToGame(it2.uid, 2)
+                navigateToMapFragment()
+            }
+
         }
 
 
