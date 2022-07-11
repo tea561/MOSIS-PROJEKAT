@@ -13,11 +13,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.firebase.geofire.GeoFire
-import com.firebase.geofire.GeoLocation
-import com.firebase.geofire.GeoQuery
-import com.firebase.geofire.GeoQueryEventListener
-import com.google.firebase.FirebaseError
+import com.firebase.geofire.*
+import com.firebase.geofire.core.GeoHash
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -26,8 +23,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.LocationExtra
 import elfak.mosis.capturetheflag.data.User
-import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import elfak.mosis.capturetheflag.utils.helpers.sendNotification
@@ -41,9 +38,12 @@ class LocationService : Service(), LocationListener {
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
 
+    private val referenceGeoFire = dbRef.child("locationsGeoFire")
+
     private var friendsList = mutableListOf<String>()
-    private lateinit var geoQueryListener: GeoQueryEventListener
+    private lateinit var geoQueryDataListener: GeoQueryDataEventListener
     private lateinit var geoQuery: GeoQuery
+    private lateinit var geoFire: GeoFire
 
 
     override fun onCreate() {
@@ -142,23 +142,29 @@ class LocationService : Service(), LocationListener {
     private fun initGeoFire()
     {
         val context = this
-        geoQueryListener = object: GeoQueryEventListener{
-            override fun onKeyEntered(key: String?, location: GeoLocation?) {
-                Log.i("GEOFIRE", "entered $key")
-                if(friendsList.contains(key))
+        geoQueryDataListener = object: GeoQueryDataEventListener {
+            override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+                val temp = dataSnapshot?.getValue<LocationExtra>()
+                if(temp?.type == "user" && dataSnapshot?.key != null)
                 {
-                    if (key != null) {
-                        getFriendByUid(context, key)
-                    }
+                    if(friendsList.contains(dataSnapshot?.key))
+                        getFriendByUid(context, dataSnapshot?.key!!)
+                }
+                else if(temp?.type == "riddle"){
+                    sendNotification(context, "You have triggered the riddle", R.drawable.ic_burst_solid)
                 }
             }
 
-            override fun onKeyExited(key: String?) {
-                Log.i("GEOFIRE", "exited $key")
+            override fun onDataExited(dataSnapshot: DataSnapshot?) {
+                Log.i("GEOFIRE", "exited ${dataSnapshot?.key}")
             }
 
-            override fun onKeyMoved(key: String?, location: GeoLocation?) {
-                Log.i("GEOFIRE", "moved $key")
+            override fun onDataMoved(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+                Log.i("GEOFIRE", "moved ${dataSnapshot?.key}")
+            }
+
+            override fun onDataChanged(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
+                Log.i("GEOFIRE", "changed ${dataSnapshot?.key}")
             }
 
             override fun onGeoQueryReady() {
@@ -166,25 +172,25 @@ class LocationService : Service(), LocationListener {
             }
 
             override fun onGeoQueryError(error: DatabaseError?) {
-                Log.i("GEOFIRE", "error")
+                Log.i("GEOFIRE", error?.message.toString())
             }
+
 
         }
 
-        val reference = dbRef.child("locationsGeoFire")
-        val geoFire = GeoFire(reference)
-        geoFire.setLocation(
-            "uYRmzF5E2LR2YW9jPBORz4sBOxL2",
-            GeoLocation(43.31585166666667, 21.90415833333333)
-        ) { key, error ->
-            if (error != null) {
-                System.err.println("There was an error saving the location to GeoFire: $error")
-            } else {
-                println("Location saved on server successfully!")
-            }
-        }
+        geoFire = GeoFire(referenceGeoFire)
+        userID?.let { referenceGeoFire.child(it).child("type").setValue("user") }
+
+        referenceGeoFire.child("keyZaRiddle").child("type").setValue("riddle")
+        val geoHash: GeoHash = GeoHash(43.31585166666667,
+            21.91415833333333)
+
+        referenceGeoFire.child("keyZaRiddle").child("l").setValue(arrayListOf(43.31585166666667,
+            21.91415833333333))
+        referenceGeoFire.child("keyZaRiddle").child("g").setValue(geoHash.geoHashString)
+
         geoQuery = geoFire.queryAtLocation(GeoLocation(0.0, 0.0), 0.0)
-        geoQuery.addGeoQueryEventListener(geoQueryListener)
+        geoQuery.addGeoQueryDataEventListener(geoQueryDataListener)
 
     }
 
@@ -213,6 +219,9 @@ class LocationService : Service(), LocationListener {
     override fun onLocationChanged(location: Location) {
         Log.i("LOCATION", "Putting location to DB...")
         putLocationToDB(location)
+        val geoHash: GeoHash = GeoHash(location.latitude, location.longitude)
+        userID?.let { referenceGeoFire.child(it).child("l").setValue(arrayListOf(location.latitude, location.longitude)) }
+        userID?.let { referenceGeoFire.child(it).child("g").setValue(geoHash.geoHashString) }
         geoQuery.center = GeoLocation(location.latitude, location.longitude)
         geoQuery.radius = 0.3
     }
