@@ -325,8 +325,9 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
-            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.team, state.latitude, state.longitude)
+            //gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.team, state.latitude, state.longitude)
 
+            mapViewModel.setMapState(MapState.InGame)
             dialog.dismiss()
             Toast.makeText(
                 requireContext(),
@@ -358,7 +359,9 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_confirm_marker, null)
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
-            gameViewModel.putGameObjectToDB(gameViewModel.gameUid, "flag", gameViewModel.team, state.latitude, state.longitude)
+            gameViewModel.objectType = "TeamFlag"
+            gameViewModel.objectLatitude = state.latitude
+            gameViewModel.objectLongitude = state.longitude
             mapViewModel.setMapState(MapState.WaitingForFlags)
             dialog.dismiss()
             Toast.makeText(
@@ -366,6 +369,7 @@ class MapFragment : Fragment() {
                 "flag, lat: ${state.latitude}, long: ${state.longitude}",
                 Toast.LENGTH_SHORT
             ).show()
+            findNavController().navigate(R.id.action_MapFragment_to_SetRiddleFragment)
         }
 
         val btnCancel = view.findViewById<Button>(R.id.btnCancel)

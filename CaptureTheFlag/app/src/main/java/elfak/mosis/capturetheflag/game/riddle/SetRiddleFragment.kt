@@ -45,6 +45,7 @@ class SetRiddleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val answerInput: EditText = binding.textInputAnswer
+        var answer: String? = ""
 
         binding.buttonUploadRiddlePhoto.setOnClickListener {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -58,7 +59,9 @@ class SetRiddleFragment : Fragment() {
         val uploadStateObserver = Observer<StoreUploadState> { state ->
             if(state is StoreUploadState.Success){
                 Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
-                //TODO: put map object to db
+                gameViewModel.putGameObjectToDB(state.message, answer!!)
+                gameViewModel.resetObjectInfo()
+                findNavController().navigate(R.id.action_SetRiddleFragment_to_MapFragment)
             }
             if (state is StoreUploadState.UploadError) {
                 Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
@@ -68,15 +71,25 @@ class SetRiddleFragment : Fragment() {
         gameViewModel.uploadState.observe(viewLifecycleOwner, uploadStateObserver)
 
         binding.buttonRiddleAccept.setOnClickListener {
-            val answer: String = answerInput.text.toString()
-            gameViewModel.uploadRiddlePhoto()
+            answer = answerInput.text.toString()
+            if(answer.isNullOrEmpty() || gameViewModel.image == null){
+                Toast.makeText(view.context, "You need to set riddle image and answer", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                gameViewModel.uploadRiddlePhoto()
+            }
+        }
+
+        binding.buttonRiddleCancel.setOnClickListener {
+            gameViewModel.resetObjectInfo()
+            findNavController().navigate(R.id.action_SetRiddleFragment_to_MapFragment)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val image = data?.extras?.get("data") as Bitmap
-            gameViewModel.setImage(image)
+            gameViewModel.image = image
         }
     }
 

@@ -132,6 +132,12 @@
             android:id="@+id/action_MapFragment_to_ProfileFragment"
             app:destination="@id/ProfileFragment" />
 
+        <action
+            android:id="@+id/action_MapFragment_to_SetRiddleFragment"
+            app:destination="@id/SetRiddleFragment" />
+
+
+
 
     </fragment>
 
@@ -292,6 +298,10 @@
         android:name="elfak.mosis.capturetheflag.game.riddle.SetRiddleFragment"
         android:label="Set Riddle Fragment"
         tools:layout="@layout/fragment_set_riddle">
+
+        <action
+            android:id="@+id/action_SetRiddleFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
     </fragment>
 
     <fragment android:id="@+id/SolveRiddleFragment"

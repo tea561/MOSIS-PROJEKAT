@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.data.UserWithLocation
@@ -99,6 +100,27 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         })
     }
 
+    fun subscribeToFlagCountInDB(gameID: String){
+        dbRef.child("games").child(gameID).child("flagCount").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                try {
+                    val flagCount = snapshot.getValue(Int::class.java)
+                    if(flagCount == 2 && mapState.value == MapState.WaitingForFlags){
+                        _mapState.value = MapState.InGame
+                    }
+                }
+                catch (e: DatabaseException){
+                    dbRef.child("games").child(gameID).child("flagCount").setValue(0)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
     override fun onMarkerClick(marker: Marker?, mapView: MapView?): Boolean {
         return false
     }
@@ -113,7 +135,7 @@ class MapViewModelFactory(private val app: Application, private val uid: String)
 
 sealed class MapState {
     object Idle: MapState()
-    class InGame(val gameId: String): MapState()
+    object InGame: MapState()
     class Cooldown(val time: Number = 120): MapState()
     class PlacingMarker(val type: String = "") : MapState()
     class ConfirmingMarker(val type: String = "", val latitude: Double, val longitude: Double) : MapState()

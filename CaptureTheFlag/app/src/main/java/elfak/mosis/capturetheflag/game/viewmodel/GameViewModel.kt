@@ -37,8 +37,12 @@ class GameViewModel : ViewModel() {
     lateinit var gameUid: String
     var team: String = ""
 
-    private val _image = MutableLiveData<Bitmap>()
-    var image: LiveData<Bitmap> = _image
+
+    var image: Bitmap? = null
+
+    var objectType: String = ""
+    var objectLatitude: Double = 0.0
+    var objectLongitude: Double = 0.0
 
     private val _uploadState by lazy { MutableLiveData<StoreUploadState>(StoreUploadState.Idle) }
     val uploadState: LiveData<StoreUploadState> = _uploadState
@@ -63,6 +67,7 @@ class GameViewModel : ViewModel() {
         dbRef.child("games").child(uniqueID).child("team1").child("name").setValue(team1)
         dbRef.child("games").child(uniqueID).child("team2").child("name").setValue(team2)
         dbRef.child("games").child(uniqueID).child("gameCode").setValue(gameCode)
+        dbRef.child("games").child(uniqueID).child("flagCount").setValue(0)
         return gameCode
     }
 
@@ -129,36 +134,49 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun putGameObjectToDB(gameID: String, type: String, team: String, lat: Double, long: Double) {
+    fun putGameObjectToDB(objectImgUrl: String, answer: String) {
         //TODO: put to DB
         val uniqueID: String = UUID.randomUUID().toString()
         val timestamp = System.currentTimeMillis()
-        val mapObject = MapObject(uniqueID, lat, long, type, timestamp, "", "", team)
+        val mapObject = MapObject(uniqueID, objectLatitude, objectLongitude, objectType, timestamp, objectImgUrl, answer, team)
+
         dbRef.child("games").child(gameUid)
             .child(team)
             .child("objects")
             .child(uniqueID).setValue(mapObject)
             .addOnSuccessListener {
-                Log.i("GAME", "Object of type $type inserted into DB with uid: $uniqueID .")
+                Log.i("GAME", "Object of type $objectType inserted into DB with uid: $uniqueID .")
+                if(objectType == "TeamFlag")
+                {
+                    dbRef.child("games").child(gameUid).child("flagCount").get().addOnSuccessListener {
+                        val count = it.value as Int
+                        dbRef.child("games").child(gameUid).child("flagCount").setValue(count + 1)
+                    }
+                }
+
             }
             .addOnFailureListener {
-                Log.e("GAME", "Error while inserting object of type $type, message was: ${it.message}")
+                Log.e("GAME", "Error while inserting object of type $objectType, message was: ${it.message}")
             }
+    }
+
+    fun resetObjectInfo() {
+        objectType = ""
+        objectLongitude = 0.0
+        objectLatitude = 0.0
+        image = null
     }
 
     fun setState(state: GameState) {
         _gameState.value = state
     }
 
-    fun setImage(image: Bitmap) {
-        _image.value = image
-    }
 
     fun uploadRiddlePhoto() {
         //TODO: uzeti id map objecta
         val photoRef = storageRef.child("riddlePictures").child("todo.jpg")
         val baos = ByteArrayOutputStream()
-        val bitmap = image.value
+        val bitmap = image
         bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
         val uploadTask = photoRef.putBytes(data)
@@ -173,9 +191,8 @@ class GameViewModel : ViewModel() {
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val photoUrl = task.result.toString()
-                //TODO: dodati photoURL za MapObject
                 _uploadState.value =
-                    StoreUploadState.Success("Upload successful with image URL: $photoUrl")
+                    StoreUploadState.Success(photoUrl)
             }
         }
     }
