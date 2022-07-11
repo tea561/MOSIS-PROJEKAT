@@ -1,6 +1,7 @@
 package elfak.mosis.capturetheflag.game.viewmodel
 
 import android.content.ContentValues
+import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -12,8 +13,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import elfak.mosis.capturetheflag.data.GameTeam
 import elfak.mosis.capturetheflag.data.MapObject
+import elfak.mosis.capturetheflag.model.StoreUploadState
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -33,11 +37,20 @@ class GameViewModel : ViewModel() {
     lateinit var gameUid: String
     var team: String = ""
 
+    private val _image = MutableLiveData<Bitmap>()
+    var image: LiveData<Bitmap> = _image
+
+    private val _uploadState by lazy { MutableLiveData<StoreUploadState>(StoreUploadState.Idle) }
+    val uploadState: LiveData<StoreUploadState> = _uploadState
+
     val teams: Map<String, GameTeam> = mapOf("team1" to GameTeam(), "team2" to GameTeam())
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
         "https://capturetheflag-56f1c-default-rtdb.firebaseio.com/")
+
+    private val storage = Firebase.storage("gs://capturetheflag-56f1c.appspot.com")
+    private val storageRef = storage.reference
 
     fun createGame(team1: String, team2: String): String{
         val uniqueID: String = UUID.randomUUID().toString()
@@ -135,6 +148,36 @@ class GameViewModel : ViewModel() {
 
     fun setState(state: GameState) {
         _gameState.value = state
+    }
+
+    fun setImage(image: Bitmap) {
+        _image.value = image
+    }
+
+    fun uploadRiddlePhoto() {
+        //TODO: uzeti id map objecta
+        val photoRef = storageRef.child("riddlePictures").child("todo.jpg")
+        val baos = ByteArrayOutputStream()
+        val bitmap = image.value
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        val uploadTask = photoRef.putBytes(data)
+
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception.let {
+                    _uploadState.value = StoreUploadState.UploadError("Upload error: ${it?.message}")
+                }
+            }
+            photoRef.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val photoUrl = task.result.toString()
+                //TODO: dodati photoURL za MapObject
+                _uploadState.value =
+                    StoreUploadState.Success("Upload successful with image URL: $photoUrl")
+            }
+        }
     }
 
     private fun randomString(): String {

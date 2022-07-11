@@ -288,4 +288,16 @@
         tools:layout="@layout/fragment_how_to_play">
     </fragment>
 
+    <fragment android:id="@+id/SetRiddleFragment"
+        android:name="elfak.mosis.capturetheflag.game.riddle.SetRiddleFragment"
+        android:label="Set Riddle Fragment"
+        tools:layout="@layout/fragment_set_riddle">
+    </fragment>
+
+    <fragment android:id="@+id/SolveRiddleFragment"
+        android:name="elfak.mosis.capturetheflag.game.riddle.SolveRiddleFragment"
+        android:label="Solve Riddle Fragment"
+        tools:layout="@layout/fragment_solve_riddle">
+    </fragment>
+
     </navigation>
