@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -180,14 +181,15 @@ class LocationService : Service(), LocationListener {
 
         geoFire = GeoFire(referenceGeoFire)
         userID?.let { referenceGeoFire.child(it).child("type").setValue("user") }
+        userID?.let { referenceGeoFire.child(it).child("additionalInfo").setValue("") }
 
-        referenceGeoFire.child("keyZaRiddle").child("type").setValue("riddle")
-        val geoHash: GeoHash = GeoHash(43.31585166666667,
-            21.91415833333333)
-
-        referenceGeoFire.child("keyZaRiddle").child("l").setValue(arrayListOf(43.31585166666667,
-            21.91415833333333))
-        referenceGeoFire.child("keyZaRiddle").child("g").setValue(geoHash.geoHashString)
+//        referenceGeoFire.child("keyZaRiddle").child("type").setValue("riddle")
+//        val geoHash: GeoHash = GeoHash(43.31585166666667,
+//            21.91415833333333)
+//
+//        referenceGeoFire.child("keyZaRiddle").child("l").setValue(arrayListOf(43.31585166666667,
+//            21.91415833333333))
+//        referenceGeoFire.child("keyZaRiddle").child("g").setValue(geoHash.geoHashString)
 
         geoQuery = geoFire.queryAtLocation(GeoLocation(0.0, 0.0), 0.0)
         geoQuery.addGeoQueryDataEventListener(geoQueryDataListener)
@@ -222,6 +224,7 @@ class LocationService : Service(), LocationListener {
         val geoHash: GeoHash = GeoHash(location.latitude, location.longitude)
         userID?.let { referenceGeoFire.child(it).child("l").setValue(arrayListOf(location.latitude, location.longitude)) }
         userID?.let { referenceGeoFire.child(it).child("g").setValue(geoHash.geoHashString) }
+
         geoQuery.center = GeoLocation(location.latitude, location.longitude)
         geoQuery.radius = 0.3
     }
@@ -229,5 +232,16 @@ class LocationService : Service(), LocationListener {
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
         Log.i("LOCATION", "onStatusChanged")
     }
+
+    override fun onProviderDisabled(provider: String) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            super.onProviderDisabled(provider)
+    }
+
+    override fun onProviderEnabled(provider: String) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            super.onProviderEnabled(provider)
+    }
+
 
 }
