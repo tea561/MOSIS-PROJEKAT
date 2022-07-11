@@ -24,6 +24,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import elfak.mosis.capturetheflag.R
+import elfak.mosis.capturetheflag.data.MapObject
 import elfak.mosis.capturetheflag.data.UserWithLocation
 import elfak.mosis.capturetheflag.game.dialogs.MapFiltersDialog
 import elfak.mosis.capturetheflag.game.dialogs.PlaceFlagDialog
@@ -31,8 +32,11 @@ import elfak.mosis.capturetheflag.game.dialogs.WaitForFlagDialog
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.FriendsViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
+import elfak.mosis.capturetheflag.utils.enums.MapFilters
 import elfak.mosis.capturetheflag.utils.extensions.FriendInfoWindow
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -56,8 +60,8 @@ class MapFragment : Fragment() {
     private val playersMarkers = ArrayList<Marker>()
     private val teamBarriersMarkers = ArrayList<Marker>()
     private val enemyBarriersMarkers = ArrayList<Marker>()
-    private val teamFlagMarker: Marker? = null
-    private val enemyFlagMarker: Marker? = null
+    private var teamFlagMarker: Marker? = null
+    private var enemyFlagMarker: Marker? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -282,6 +286,8 @@ class MapFragment : Fragment() {
                 fabFilters.hide()
             }
             is MapState.BeginGame -> {
+                val prefs = PreferenceHelper.customPreference(context!!, "User_data")
+                prefs.gameID = gameViewModel.gameUid
                     if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
                         val dialog = WaitForFlagDialog()
                         dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
@@ -383,14 +389,14 @@ class MapFragment : Fragment() {
     }
 
     private fun setUserWithLocationsObserver(state: MutableMap<String, UserWithLocation>) {
-        if (markerViewModel.filters.value?.get("Friends") == true) {
+        if (markerViewModel.filters.value?.get(MapFilters.Friends.value) == true) {
             drawFriends(state)
         }
     }
 
     private fun setFiltersObserver(state: MutableMap<String, Boolean>) {
         //TODO: go through each value and redraw markers
-        if (state["Friends"] == true) {
+        if (state[MapFilters.Friends.value] == true && mapViewModel.mapState.value is MapState.Idle) {
             markerViewModel.friendsWithLocations.value?.let { drawFriends(it) }
         }
         else {
@@ -398,6 +404,56 @@ class MapFragment : Fragment() {
                 map.overlays.remove(marker)
             }
             friendsMarkers.clear()
+        }
+
+        if (state[MapFilters.Players.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
+            //TODO: draw players on map
+        }
+        else {
+            playersMarkers.forEach { marker ->
+                map.overlays.remove(marker)
+            }
+            playersMarkers.clear()
+        }
+
+        if (state[MapFilters.TeamBarriers.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
+            //TODO: draw team barriers on map
+        }
+        else {
+            teamBarriersMarkers.forEach { marker ->
+                map.overlays.remove(marker)
+            }
+            teamBarriersMarkers.clear()
+        }
+
+        if (state[MapFilters.EnemyBarriers.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
+            //TODO: draw team barriers on map
+        }
+        else {
+            enemyBarriersMarkers.forEach { marker ->
+                map.overlays.remove(marker)
+            }
+            enemyBarriersMarkers.clear()
+        }
+
+        if (state[MapFilters.TeamFlag.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
+            //TODO: draw team flag on map
+        }
+        else {
+            if (teamFlagMarker != null) {
+                map.overlays.remove(teamFlagMarker)
+            }
+            teamFlagMarker = null
+        }
+
+        if (state[MapFilters.EnemyFlag.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
+            //TODO: draw enemy flag on map
+        }
+        else {
+            if (enemyFlagMarker != null) {
+                map.overlays.remove(enemyFlagMarker)
+            }
+            enemyFlagMarker = null
         }
     }
 
@@ -416,24 +472,54 @@ class MapFragment : Fragment() {
                 marker.icon.setTint(R.color.blue)
                 user.user.uid = uid
                 marker.setInfoWindow(FriendInfoWindow(R.layout.bubble_friend_marker, map, this, user.user))
-
-
                 friendsMarkers.add(marker)
                 map.overlays.add(marker)
             }
         }
     }
 
-    private fun drawPlayers() {
+    private fun drawPlayers(friends: MutableMap<String, UserWithLocation>) {
         //TODO: implement
     }
 
-    private fun drawTeamBarriers() {
-        //TODO: implement
+    private fun drawTeamBarriers(teamBarriers: MutableMap<String, MapObject>) {
+        teamBarriersMarkers.forEach { marker ->
+            map.overlays.remove(marker)
+        }
+        teamBarriersMarkers.clear()
+
+        teamBarriers.forEach { (uid, barrier) ->
+            if (barrier != null) {
+                val marker = Marker(map)
+                marker.position = GeoPoint(barrier.latitude, barrier.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon.setTint(R.color.blue)
+                marker.setInfoWindow(null)
+                teamBarriersMarkers.add(marker)
+                map.overlays.add(marker)
+            }
+        }
     }
 
-    private fun drawEnemyBarriers() {
-        //TODO: implement
+    private fun drawEnemyBarriers(enemyBarriers: MutableMap<String, MapObject>) {
+        enemyBarriersMarkers.forEach { marker ->
+            map.overlays.remove(marker)
+        }
+        enemyBarriersMarkers.clear()
+
+        enemyBarriers.forEach { (uid, barrier) ->
+            if (barrier != null) {
+                val marker = Marker(map)
+                marker.position = GeoPoint(barrier.latitude, barrier.longitude)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon.setTint(R.color.blue)
+                marker.setInfoWindow(null)
+                enemyBarriersMarkers.add(marker)
+                map.overlays.add(marker)
+            }
+        }
     }
 
     private fun drawTeamFlag() {

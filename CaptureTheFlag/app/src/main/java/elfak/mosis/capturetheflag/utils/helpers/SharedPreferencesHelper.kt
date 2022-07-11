@@ -8,6 +8,8 @@ object PreferenceHelper {
 
     val USER_ID = "USER_ID"
     val USER_PASSWORD = "PASSWORD"
+    val IS_APP_ACTIVE = "IS_APP_ACTIVE"
+    val GAME_ID = "GAME_ID"
 
     fun defaultPreference(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -37,6 +39,22 @@ object PreferenceHelper {
         set(value) {
             editPref {
                 it.putString(USER_ID, value)
+            }
+        }
+
+    var SharedPreferences.isAppActive
+        get() = getBoolean(IS_APP_ACTIVE, true)
+        set(value) {
+            editPref {
+                it.putBoolean(IS_APP_ACTIVE, value)
+            }
+        }
+
+    var SharedPreferences.gameID
+        get() = getString(GAME_ID, "")
+        set(value) {
+            editPref {
+                it.putString(GAME_ID, value)
             }
         }
 

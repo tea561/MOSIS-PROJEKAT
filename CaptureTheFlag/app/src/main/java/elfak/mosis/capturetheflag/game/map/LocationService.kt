@@ -27,6 +27,8 @@ import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.LocationExtra
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import elfak.mosis.capturetheflag.utils.helpers.sendNotification
 
@@ -34,6 +36,8 @@ import elfak.mosis.capturetheflag.utils.helpers.sendNotification
 class LocationService : Service(), LocationListener {
 
     private var userID: String? = ""
+    private var isAppActive: Boolean = false
+    private var gameID: String? = ""
 
     private val database = Firebase.database
     private val dbRef = database.getReferenceFromUrl(
@@ -80,8 +84,12 @@ class LocationService : Service(), LocationListener {
                 Log.i("LOCATION", "Location Service is running in the background.")
 
         }.start()
+        
         val prefs = PreferenceHelper.customPreference(this, "User_data")
         userID = prefs.userId
+        gameID = prefs.gameID
+        isAppActive = prefs.isAppActive
+
         getFriends()
         initGeoFire()
         return START_STICKY

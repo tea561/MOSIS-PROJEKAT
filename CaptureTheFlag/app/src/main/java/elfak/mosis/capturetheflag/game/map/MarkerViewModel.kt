@@ -15,6 +15,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.data.UserWithLocation
+import elfak.mosis.capturetheflag.utils.enums.MapFilters
 import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
 
 class MarkerViewModel : ViewModel() {
@@ -32,9 +33,9 @@ class MarkerViewModel : ViewModel() {
 
     init {
         _filters.value = mutableMapOf(
-            "Friends" to true, "Players" to true,
-            "Team Barriers" to true, "Enemy Barriers" to true,
-            "Team Flag" to true, "Enemy Flag" to true)
+            MapFilters.Friends.value to true, MapFilters.Players.value to true,
+            MapFilters.TeamBarriers.value to true, MapFilters.EnemyBarriers.value to true,
+            MapFilters.TeamFlag.value to true, MapFilters.EnemyFlag.value to true)
         _friendsWithLocations.value = mutableMapOf()
     }
 

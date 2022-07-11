@@ -90,6 +90,7 @@ class SetRiddleFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val image = data?.extras?.get("data") as Bitmap
             gameViewModel.image = image
+            binding.imageView6.setImageBitmap(image)
         }
     }
 

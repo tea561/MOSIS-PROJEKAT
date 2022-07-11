@@ -20,6 +20,10 @@ import elfak.mosis.capturetheflag.databinding.ActivityMainBinding
 import elfak.mosis.capturetheflag.game.map.LocationService
 import elfak.mosis.capturetheflag.model.MainViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,39 +46,10 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        /*binding.fab.setOnClickListener { view ->
-            val dialog = BottomSheetDialog(this)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
-            val btnBarrier = view.findViewById<Button>(R.id.btnBarrier)
-            btnBarrier.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into barrier marker positioning state
-                dialog.dismiss()
-            }
-
-            val btnEnemyBarrier = view.findViewById<Button>(R.id.btnEnemyBarrier)
-            btnEnemyBarrier.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into enemy barrier marker positioning state
-                dialog.dismiss()
-            }
-
-            val btnEnemyFlag = view.findViewById<Button>(R.id.btnEnemyFlag)
-            btnEnemyFlag.setOnClickListener {
-                //TODO: pull out bottom_sheet_set_marker
-                //TODO: put game into enemy flag marker positioning state
-                dialog.dismiss()
-            }
-            dialog.setCancelable(true)
-            dialog.setContentView(view)
-            dialog.show()
-        }*/
         binding.fab.hide()
+        val prefs = PreferenceHelper.customPreference(this, "User_data")
 
-        /*navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            if ( destination.id == R.id.MapFragment)
-                binding.fab.show()
-        }*/
+        prefs.isAppActive = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -101,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        val prefs = PreferenceHelper.customPreference(this, "User_data")
+        prefs.isAppActive = false
         if (!mainViewModel.keepLocationServiceAlive) {
             stopService(Intent(this, LocationService().javaClass))
         }
