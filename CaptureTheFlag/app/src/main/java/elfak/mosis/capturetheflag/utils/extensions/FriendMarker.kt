@@ -12,7 +12,7 @@ import org.osmdroid.views.overlay.Marker
 
 class FriendMarker(private val mapView: MapView, private val user: User, private val fragment: MapFragment): Marker(mapView) {
 
-    override fun onLongPress(event: MotionEvent?, mapView: MapView?): Boolean {
+    /*override fun onLongPress(event: MotionEvent?, mapView: MapView?): Boolean {
         fragment.openFriendProfile(user)
         return super.onLongPress(event, mapView)
     }
@@ -20,5 +20,5 @@ class FriendMarker(private val mapView: MapView, private val user: User, private
     override fun onDoubleTap(e: MotionEvent?, mapView: MapView?): Boolean {
         fragment.openFriendProfile(user)
         return true
-    }
+    }*/
 }

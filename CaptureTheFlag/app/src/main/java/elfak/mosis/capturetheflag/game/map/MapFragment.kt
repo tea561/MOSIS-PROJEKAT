@@ -134,10 +134,10 @@ class MapFragment : Fragment() {
         removeObservers()
     }
 
-    fun openFriendProfile(user: User){
-        setFragmentResult("requestFriend", bundleOf("bundleFriend" to user.uid))
+    fun openFriendProfile(userUid: String){
+        setFragmentResult("requestFriend", bundleOf("bundleFriend" to userUid))
         findNavController().navigate(R.id.action_MapFragment_to_ProfileFragment)
-        Log.i("CLICK ON FRIEND", user.username ?: "empty")
+        Log.i("CLICK ON FRIEND", userUid ?: "empty")
     }
 
     @SuppressLint("MissingPermission")
@@ -413,23 +413,9 @@ class MapFragment : Fragment() {
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                 marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
                 marker.icon.setTint(R.color.blue)
-                //marker.setOnMarkerClickListener(mapViewModel)
-                val executor = Executors.newSingleThreadExecutor()
-                var image: Bitmap? = null
-                executor.execute{
-                    val imageUrl = user.user.imgUrl
-                    try {
-                        val `in` = java.net.URL(imageUrl).openStream()
-                        image = BitmapFactory.decodeStream(`in`)
-                        val handler = Handler(Looper.getMainLooper())
-                        handler.post{
-                            marker.image = image?.toDrawable(resources)
-                        }
-                    }
-                    catch(e: Exception){
-                        e.printStackTrace()
-                    }
-                }
+                user.user.uid = uid
+                marker.setInfoWindow(FriendInfoWindow(R.layout.bubble_friend_marker, map, this, user.user))
+
 
                 friendsMarkers.add(marker)
                 map.overlays.add(marker)

@@ -40,6 +40,7 @@ class FriendsViewModel : ViewModel() {
         val valueEventListener = object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)
+                user?.uid = friendUid
                 if(_friends.value == null)
                     _friends.value = mutableListOf()
                 if(user != null) {
