@@ -62,7 +62,6 @@ class SetRiddleFragment : Fragment() {
                 Toast.makeText(view.context, state.message, Toast.LENGTH_SHORT).show()
                 gameViewModel.putGameObjectToDB(state.message, answer!!)
                 gameViewModel.resetObjectInfo()
-
                 findNavController().navigate(R.id.action_SetRiddleFragment_to_MapFragment)
             }
             if (state is StoreUploadState.UploadError) {

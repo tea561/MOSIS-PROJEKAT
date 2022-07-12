@@ -53,6 +53,10 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         _mapState.value = state
     }
 
+    fun setUserIDAfterLogin(id: String) {
+        uid = id
+    }
+
     override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
         Log.d("singleTapConfirmedHelper", "single tap on map pap ha")
         if (_mapState.value is MapState.PlacingMarker) {
@@ -106,7 +110,7 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                                 || mapState.value == MapState.Idle)){
                         _mapState.value = MapState.InGame
                     }
-                    else if (flagCount == 0.toLong()) {
+                    else if (flagCount < 2.toLong()) {
                         _mapState.value = MapState.BeginGame
                     }
                 }

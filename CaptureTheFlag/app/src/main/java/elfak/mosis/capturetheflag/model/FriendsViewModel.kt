@@ -63,7 +63,7 @@ class FriendsViewModel : ViewModel() {
             }
 
         }
-        ref.addListenerForSingleValueEvent(valueEventListener)
+        ref.addValueEventListener(valueEventListener)
 
     }
 

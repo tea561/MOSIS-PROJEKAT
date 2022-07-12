@@ -148,6 +148,10 @@
             android:id="@+id/action_MapFragment_to_RiddleFragment"
             app:destination="@id/RiddleFragment" />
 
+        <action
+            android:id="@+id/action_MapFragment_to_GameOverFragment"
+            app:destination="@id/GameOverFragment" />
+
     </fragment>
 
     <fragment android:id="@+id/ProfileFragment"
@@ -276,14 +280,18 @@
             tools:layout="@layout/fragment_riddle">
 
         <action
-            android:id="@+id/action_RiddleFragment_to_MapFragment"
-            app:destination="@id/RiddleFragment" />
+            android:id="@+id/action_RiddleFragment_to_SolveRiddleFragment"
+            app:destination="@id/SolveRiddleFragment" />
     </fragment>
 
     <fragment android:id="@+id/GameOverFragment"
             android:name="elfak.mosis.capturetheflag.game.gameover.GameOverFragment"
             android:label="Game Over Fragment"
             tools:layout="@layout/fragment_game_over">
+
+        <action
+            android:id="@+id/action_GameOverFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
     </fragment>
 
     <fragment android:id="@+id/RankingsFragment"
@@ -321,6 +329,11 @@
         android:name="elfak.mosis.capturetheflag.game.riddle.SolveRiddleFragment"
         android:label="Solve Riddle Fragment"
         tools:layout="@layout/fragment_solve_riddle">
+
+        <action
+            android:id="@+id/action_SolveRiddleFragment_to_MapFragment"
+            app:destination="@id/MapFragment" />
+
     </fragment>
 
     </navigation>

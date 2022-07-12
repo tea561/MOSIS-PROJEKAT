@@ -14,16 +14,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.databinding.ActivityMainBinding
 import elfak.mosis.capturetheflag.game.gameover.RiddleFragment
 import elfak.mosis.capturetheflag.game.map.LocationService
+import elfak.mosis.capturetheflag.game.map.MapViewModel
+import elfak.mosis.capturetheflag.game.map.MapViewModelFactory
 import elfak.mosis.capturetheflag.model.MainViewModel
+import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
@@ -41,15 +46,22 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.i("RECEIVER", "HI")
             val msg = intent?.getStringExtra("message")
+            val imgID = intent?.getStringExtra("imgID")
+            val gameID = intent?.getStringExtra("gameID")
+            val team = intent?.getStringExtra("team")
 
-            startRiddleFragment(msg)
+            startRiddleFragment(msg, imgID, gameID, team)
         }
     }
 
-    fun startRiddleFragment(msg: String?){
+    fun startRiddleFragment(msg: String?, imgID: String?, gameID: String?, team: String?){
 //        val rf = RiddleFragment()
         val bundle = Bundle()
         bundle.putString("messageBundle", msg)
+        bundle.putString("imgIDBundle", imgID)
+        bundle.putString("gameIDBundle", gameID)
+        bundle.putString("teamBundle", team)
+
 
         findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_global_test, bundle)
 

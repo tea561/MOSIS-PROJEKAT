@@ -272,11 +272,14 @@ class MapFragment : Fragment() {
             setFiltersObserver(state)
         }
         markerViewModel.filters.observe(viewLifecycleOwner, filtersObserver)
+
+        val winnerObserver = Observer<String>{state ->
+            setWinnerObserver(state)
+        }
+        gameViewModel.winner.observe(viewLifecycleOwner, winnerObserver)
     }
 
     private fun removeObservers() {
-        gameViewModel.gameState.removeObservers(viewLifecycleOwner)
-
         mapViewModel.mapState.removeObservers(viewLifecycleOwner)
 
         markerViewModel.friendsWithLocations.removeObservers(viewLifecycleOwner)
@@ -291,6 +294,7 @@ class MapFragment : Fragment() {
     private fun setMapStateObserver(state: MapState) {
         val fab = requireView().findViewById<FloatingActionButton>(R.id.fab)
         val fabFilters = requireView().findViewById<FloatingActionButton>(R.id.fabFilters)
+        val prefs = PreferenceHelper.customPreference(context!!, "User_data")
 
         when (state) {
             is MapState.ConfirmingMarker -> {
@@ -299,25 +303,25 @@ class MapFragment : Fragment() {
                 mapObserverConfirmingMarker(state)
             }
             is MapState.Idle -> {
+                prefs.gameID = ""
                 fab.hide()
                 fabFilters.show()
             }
             is MapState.InGame -> {
                 markerViewModel.filters.value?.let { setFiltersObserver(it) }
                 markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
-                val prefs = PreferenceHelper.customPreference(context!!, "User_data")
+
                 prefs.gameID = gameViewModel.gameUid
                 prefs.opposingTeam = gameViewModel.opposingTeamName
                 fab.show()
                 fabFilters.show()
             }
             is MapState.PlacingMarker -> {
+                prefs.gameID = ""
                 fab.hide()
                 fabFilters.hide()
             }
             is MapState.BeginGame -> {
-                val prefs = PreferenceHelper.customPreference(context!!, "User_data")
-                prefs.gameID = gameViewModel.gameUid
                 prefs.opposingTeam = gameViewModel.opposingTeamName
                 markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
                     if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
@@ -326,6 +330,7 @@ class MapFragment : Fragment() {
                     }
                     else {
                         val dialog = PlaceFlagDialog()
+                        gameViewModel.teams[gameViewModel.team]!!.memberCount++
                         dialog.show(activity!!.supportFragmentManager, "PlaceFlagDialog")
                     }
             }
@@ -523,6 +528,23 @@ class MapFragment : Fragment() {
             enemyFlagMarker = null
         }
     }
+
+    private fun setWinnerObserver(state: String){
+        if(state != "" && state == gameViewModel.team){
+            mapViewModel.setMapState(MapState.Idle)
+            gameViewModel.resetGame()
+            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM WON"))
+            findNavController().navigate(R.id.action_MapFragment_to_GameOverFragment)
+
+        }
+        else if (state != "") {
+            mapViewModel.setMapState(MapState.Idle)
+            gameViewModel.resetGame()
+            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM LOST"))
+            findNavController().navigate(R.id.action_MapFragment_to_GameOverFragment)
+        }
+    }
+
     //endregion
 
     //region Draw Markers

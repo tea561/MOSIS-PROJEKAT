@@ -169,24 +169,37 @@ class LocationService : Service(), LocationListener {
                     if(friendsList.contains(dataSnapshot?.key))
                         getFriendByUid(context, dataSnapshot?.key!!)
                 }
-                else if(temp?.type == MapFilters.TeamBarriers.value && prefs.opposingTeam == temp?.additionalInfo){
-                    if(prefs.isAppActive){
-                        val notificationIntent = Intent("SOME_ACTION")
-                        notificationIntent.putExtra("message", "You have triggered the riddle")
-                        sendBroadcast(notificationIntent)
-                    }
-                    else{
-                        sendNotification(context, "You have triggered the riddle", R.drawable.ic_burst_solid)
-                    }
-                }
-                else if(temp?.type == MapFilters.TeamFlag.value && prefs.opposingTeam == temp?.additionalInfo){
-                    if(prefs.isAppActive){
-                        val notificationIntent = Intent("SOME_ACTION")
-                        notificationIntent.putExtra("message", "You came across the enemy flag")
-                        sendBroadcast(notificationIntent)
-                    }
-                    else {
-                        sendNotification(context, "You came across the enemy flag", R.drawable.ic_flag_solid)
+                else if (prefs.gameID != "") {
+                    if (temp?.type == MapFilters.TeamBarriers.value && prefs.opposingTeam == temp?.additionalInfo) {
+                        if (prefs.isAppActive) {
+                            val notificationIntent = Intent("SOME_ACTION")
+                            notificationIntent.putExtra("message", "You have triggered the riddle")
+                            notificationIntent.putExtra("imgID", dataSnapshot?.key)
+                            notificationIntent.putExtra("team", temp?.team)
+                            notificationIntent.putExtra("gameID", prefs.gameID)
+                            sendBroadcast(notificationIntent)
+                        } else {
+                            sendNotification(
+                                context,
+                                "You have triggered the riddle",
+                                R.drawable.ic_burst_solid
+                            )
+                        }
+                    } else if (temp?.type == MapFilters.TeamFlag.value && prefs.opposingTeam == temp?.additionalInfo) {
+                        if (prefs.isAppActive) {
+                            val notificationIntent = Intent("SOME_ACTION")
+                            notificationIntent.putExtra("message", "You came across the enemy flag")
+                            notificationIntent.putExtra("imgID", dataSnapshot?.key)
+                            notificationIntent.putExtra("team", temp?.team)
+                            notificationIntent.putExtra("gameID", prefs.gameID)
+                            sendBroadcast(notificationIntent)
+                        } else {
+                            sendNotification(
+                                context,
+                                "You came across the enemy flag",
+                                R.drawable.ic_flag_solid
+                            )
+                        }
                     }
                 }
 
@@ -218,6 +231,7 @@ class LocationService : Service(), LocationListener {
         geoFire = GeoFire(referenceGeoFire)
         userID?.let { referenceGeoFire.child(it).child("type").setValue("user") }
         userID?.let { referenceGeoFire.child(it).child("additionalInfo").setValue("") }
+        userID?.let { referenceGeoFire.child(it).child("team").setValue("") }
 
 //        referenceGeoFire.child("keyZaRiddle").child("type").setValue("riddle")
 //        val geoHash: GeoHash = GeoHash(43.31585166666667,

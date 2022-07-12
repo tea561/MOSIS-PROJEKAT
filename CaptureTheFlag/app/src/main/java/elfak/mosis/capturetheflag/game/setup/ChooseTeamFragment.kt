@@ -88,6 +88,7 @@ class ChooseTeamFragment : Fragment() {
     }
 
     private fun navigateToMapFragment() {
+        gameViewModel.subscribeToWinnerInDB()
         mapViewModel.subscribeToFlagCountInDB(gameViewModel.gameUid)
         findNavController().navigate(R.id.action_ChooseTeamFragment_to_MapFragment)
     }

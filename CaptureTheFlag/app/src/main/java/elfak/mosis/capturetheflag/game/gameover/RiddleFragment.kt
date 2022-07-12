@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
@@ -29,6 +31,9 @@ class RiddleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var imgID : String? = ""
+        var gameID: String? = ""
+        var team : String? = ""
 
         arguments?.let {
 
@@ -36,16 +41,32 @@ class RiddleFragment : Fragment() {
                 val msg = it.getString("messageBundle")
                 binding.TextViewMessage.text = msg
             }
+
+            if(it.getSerializable("imgIDBundle") != null){
+                imgID = it.getString("imgIDBundle")
+            }
+
+            if(it.getSerializable("gameIDBundle") != null){
+                gameID = it.getString("gameIDBundle")
+            }
+
+            if(it.getSerializable("teamBundle") != null){
+                team = it.getString("teamBundle")
+            }
         }
+
+
 
         binding.TextViewMessage.setOnClickListener {
-            findNavController().navigate(R.id.action_RiddleFragment_to_MapFragment)
+            val bundle = Bundle()
+            bundle.putString("imgID", imgID)
+            bundle.putString("gameIDBundle", gameID)
+            bundle.putString("teamBundle", team)
+
+            findNavController().navigate(R.id.action_RiddleFragment_to_SolveRiddleFragment, bundle)
         }
 
-//        setFragmentResultListener("requestText"){ requestText, bundle ->
-//            binding.TextViewMessage.text = bundle.getString("bundleText")
-//
-//        }
+
     }
 
 }
