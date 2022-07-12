@@ -188,7 +188,6 @@ class GameViewModel : ViewModel() {
 
 
     fun uploadRiddlePhoto() {
-        //TODO: uzeti id map objecta
         val uniqueID: String = UUID.randomUUID().toString()
         objectID = uniqueID
         val photoRef = storageRef.child("riddlePictures").child("$uniqueID.jpg")
