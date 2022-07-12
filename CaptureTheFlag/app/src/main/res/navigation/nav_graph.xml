@@ -5,6 +5,14 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/LoginFragment">
 
+    <action
+        android:id="@+id/action_global_test"
+        app:destination="@id/RiddleFragment"
+        app:launchSingleTop="false"
+        app:popUpTo="@+id/nav_graph"
+        app:popUpToInclusive="true" />
+
+
     <fragment
         android:id="@+id/LoginFragment"
         android:name="elfak.mosis.capturetheflag.authentication.LoginFragment"
@@ -136,8 +144,9 @@
             android:id="@+id/action_MapFragment_to_SetRiddleFragment"
             app:destination="@id/SetRiddleFragment" />
 
-
-
+        <action
+            android:id="@+id/action_MapFragment_to_RiddleFragment"
+            app:destination="@id/RiddleFragment" />
 
     </fragment>
 
@@ -265,6 +274,10 @@
             android:name="elfak.mosis.capturetheflag.game.gameover.RiddleFragment"
             android:label="Riddle Fragment"
             tools:layout="@layout/fragment_riddle">
+
+        <action
+            android:id="@+id/action_RiddleFragment_to_MapFragment"
+            app:destination="@id/RiddleFragment" />
     </fragment>
 
     <fragment android:id="@+id/GameOverFragment"

@@ -37,6 +37,7 @@ import elfak.mosis.capturetheflag.utils.extensions.FriendInfoWindow
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -306,6 +307,7 @@ class MapFragment : Fragment() {
                 markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
                 val prefs = PreferenceHelper.customPreference(context!!, "User_data")
                 prefs.gameID = gameViewModel.gameUid
+                prefs.opposingTeam = gameViewModel.opposingTeamName
                 fab.show()
                 fabFilters.show()
             }
@@ -316,6 +318,7 @@ class MapFragment : Fragment() {
             is MapState.BeginGame -> {
                 val prefs = PreferenceHelper.customPreference(context!!, "User_data")
                 prefs.gameID = gameViewModel.gameUid
+                prefs.opposingTeam = gameViewModel.opposingTeamName
                 markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
                     if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
                         val dialog = WaitForFlagDialog()
@@ -622,6 +625,12 @@ class MapFragment : Fragment() {
             enemyFlagMarker = marker
             map.overlays.add(marker)
         }
+    }
+
+    private fun navigateToRiddleFragment(message: String)
+    {
+        setFragmentResult("requestText", bundleOf("bundleText" to message))
+        findNavController().navigate(R.id.action_MapFragment_to_RiddleFragment)
     }
     //endregion
 }

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.firebase.geofire.core.GeoHash
 
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -37,6 +38,8 @@ class GameViewModel : ViewModel() {
 
     lateinit var gameUid: String
     var team: String = ""
+    var opposingTeamName: String = ""
+
 
 
     var image: Bitmap? = null
@@ -122,6 +125,8 @@ class GameViewModel : ViewModel() {
     fun addPlayerToGame(userUid: String, teamNum: Int)
     {
         team = if(teamNum == 1) "team1" else "team2"
+        val opponent = if(teamNum == 1) "team2" else "team1"
+        opposingTeamName = teams[opponent]!!.teamName
         val key = dbRef.child("games").child(gameUid).child(team).push().key
         if(key == null){
             _joinGameState.value = FindGameState.FindGameError("Couldn't get push key for posts")
@@ -159,6 +164,14 @@ class GameViewModel : ViewModel() {
             answer,
             team
         )
+
+        dbRef.child("locationsGeoFire").child(objectID).child("type").setValue(objectType)
+        val geoHash: GeoHash = GeoHash(objectLatitude,
+            objectLongitude)
+        dbRef.child("locationsGeoFire").child(objectID).child("l").setValue(arrayListOf(objectLatitude, objectLongitude))
+        dbRef.child("locationsGeoFire").child(objectID).child("g").setValue(geoHash.geoHashString)
+        dbRef.child("locationsGeoFire").child(objectID).child("additionalInfo").setValue(teams[team]!!.teamName)
+
         dbRef.child("games").child(gameUid)
             .child(team)
             .child("objects")

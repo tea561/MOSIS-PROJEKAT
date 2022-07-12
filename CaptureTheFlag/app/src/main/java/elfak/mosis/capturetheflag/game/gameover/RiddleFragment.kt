@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentGameCodeBinding
 import elfak.mosis.capturetheflag.databinding.FragmentRiddleBinding
@@ -29,10 +30,22 @@ class RiddleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setFragmentResultListener("requestText"){ requestText, bundle ->
-            binding.TextViewMessage.text = bundle.getString("bundleText")
+        arguments?.let {
 
+            if (it.getSerializable("messageBundle") != null) {
+                val msg = it.getString("messageBundle")
+                binding.TextViewMessage.text = msg
+            }
         }
+
+        binding.TextViewMessage.setOnClickListener {
+            findNavController().navigate(R.id.action_RiddleFragment_to_MapFragment)
+        }
+
+//        setFragmentResultListener("requestText"){ requestText, bundle ->
+//            binding.TextViewMessage.text = bundle.getString("bundleText")
+//
+//        }
     }
 
 }

@@ -1,35 +1,64 @@
 package elfak.mosis.capturetheflag
 
+import android.app.Fragment
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Button
-import androidx.activity.viewModels
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
 import elfak.mosis.capturetheflag.databinding.ActivityMainBinding
+import elfak.mosis.capturetheflag.game.gameover.RiddleFragment
 import elfak.mosis.capturetheflag.game.map.LocationService
 import elfak.mosis.capturetheflag.model.MainViewModel
-import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
-import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
-import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
+
+    private var br : BroadcastReceiver? = null
+
+    inner class MyBroadCastReceiver: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.i("RECEIVER", "HI")
+            val msg = intent?.getStringExtra("message")
+
+            startRiddleFragment(msg)
+        }
+    }
+
+    fun startRiddleFragment(msg: String?){
+//        val rf = RiddleFragment()
+        val bundle = Bundle()
+        bundle.putString("messageBundle", msg)
+
+        findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_global_test, bundle)
+
+
+//        val fm = fragmentManager
+//        val transaction = fm.beginTransaction()
+//        transaction.replace(R.id.RiddleFragment, rf as Fragment)
+//        transaction.commit()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +77,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.fab.hide()
         val prefs = PreferenceHelper.customPreference(this, "User_data")
+
+        val filter = IntentFilter()
+        filter.addAction("SOME_ACTION")
+
+        br = MyBroadCastReceiver()
+        registerReceiver(br, filter)
 
         prefs.isAppActive = true
     }
@@ -74,10 +109,21 @@ class MainActivity : AppCompatActivity() {
                 || super.onSupportNavigateUp()
     }
 
+    override fun onStop() {
+        super.onStop()
+        val prefs = PreferenceHelper.customPreference(this, "User_data")
+        prefs.isAppActive = false
+    }
+
     override fun onDestroy() {
+        if (br != null) {
+            unregisterReceiver(br);
+            br = null;
+        }
         super.onDestroy()
         val prefs = PreferenceHelper.customPreference(this, "User_data")
         prefs.isAppActive = false
+
         if (!mainViewModel.keepLocationServiceAlive) {
             stopService(Intent(this, LocationService().javaClass))
         }

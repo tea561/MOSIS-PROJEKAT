@@ -1,6 +1,9 @@
 package elfak.mosis.capturetheflag.game.map
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.ContentValues
 import android.content.Context
@@ -12,8 +15,10 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import com.firebase.geofire.*
 import com.firebase.geofire.core.GeoHash
 import com.google.firebase.database.ChildEventListener
@@ -23,18 +28,22 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import elfak.mosis.capturetheflag.MainActivity
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.LocationExtra
 import elfak.mosis.capturetheflag.data.User
+import elfak.mosis.capturetheflag.utils.enums.MapFilters
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import elfak.mosis.capturetheflag.utils.helpers.sendNotification
+import java.util.*
 
 
 class LocationService : Service(), LocationListener {
-
+    val NOTIFICATION_CHANNEL_ID = "CTFChannel"
     private var userID: String? = ""
     private var isAppActive: Boolean = false
     private var gameID: String? = ""
@@ -151,6 +160,7 @@ class LocationService : Service(), LocationListener {
     private fun initGeoFire()
     {
         val context = this
+        val prefs = PreferenceHelper.customPreference(context!!, "User_data")
         geoQueryDataListener = object: GeoQueryDataEventListener {
             override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
                 val temp = dataSnapshot?.getValue<LocationExtra>()
@@ -159,9 +169,27 @@ class LocationService : Service(), LocationListener {
                     if(friendsList.contains(dataSnapshot?.key))
                         getFriendByUid(context, dataSnapshot?.key!!)
                 }
-                else if(temp?.type == "riddle"){
-                    sendNotification(context, "You have triggered the riddle", R.drawable.ic_burst_solid)
+                else if(temp?.type == MapFilters.TeamBarriers.value && prefs.opposingTeam == temp?.additionalInfo){
+                    if(prefs.isAppActive){
+                        val notificationIntent = Intent("SOME_ACTION")
+                        notificationIntent.putExtra("message", "You have triggered the riddle")
+                        sendBroadcast(notificationIntent)
+                    }
+                    else{
+                        sendNotification(context, "You have triggered the riddle", R.drawable.ic_burst_solid)
+                    }
                 }
+                else if(temp?.type == MapFilters.TeamFlag.value && prefs.opposingTeam == temp?.additionalInfo){
+                    if(prefs.isAppActive){
+                        val notificationIntent = Intent("SOME_ACTION")
+                        notificationIntent.putExtra("message", "You came across the enemy flag")
+                        sendBroadcast(notificationIntent)
+                    }
+                    else {
+                        sendNotification(context, "You came across the enemy flag", R.drawable.ic_flag_solid)
+                    }
+                }
+
             }
 
             override fun onDataExited(dataSnapshot: DataSnapshot?) {

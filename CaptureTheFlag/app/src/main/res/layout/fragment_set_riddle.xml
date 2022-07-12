@@ -36,7 +36,7 @@
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="match_parent"
-        android:layout_height="373dp"
+        android:layout_height="341dp"
         android:src="@drawable/intro1" />
 
     <Button
@@ -53,8 +53,8 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputRiddleAnswer"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="373dp"
-        android:layout_height="130dp"
+        android:layout_width="374dp"
+        android:layout_height="68dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
