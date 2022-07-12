@@ -137,20 +137,29 @@ class GameViewModel : ViewModel() {
 
     fun putGameObjectToDB(objectImgUrl: String, answer: String) {
         //TODO: put to DB
+        val gameUid = gameUid
         val uniqueID: String = UUID.randomUUID().toString()
         val timestamp = System.currentTimeMillis()
-        val mapObject = MapObject(uniqueID, objectLatitude, objectLongitude, objectType, timestamp, objectImgUrl, answer, team)
-
+        val mapObject = MapObject(
+            uniqueID,
+            objectLatitude,
+            objectLongitude,
+            objectType,
+            timestamp,
+            objectImgUrl,
+            answer,
+            team
+        )
         dbRef.child("games").child(gameUid)
             .child(team)
             .child("objects")
             .child(uniqueID).setValue(mapObject)
             .addOnSuccessListener {
-                Log.i("GAME", "Object of type $objectType inserted into DB with uid: $uniqueID .")
-                if(objectType == MapFilters.TeamFlag.value)
+                Log.i("GAME", "Object of type ${mapObject.type} inserted into DB with uid: $uniqueID .")
+                if(mapObject.type == MapFilters.TeamFlag.value)
                 {
                     dbRef.child("games").child(gameUid).child("flagCount").get().addOnSuccessListener {
-                        val count = it.value as Int
+                        val count = it.value as Long
                         dbRef.child("games").child(gameUid).child("flagCount").setValue(count + 1)
                     }
                 }

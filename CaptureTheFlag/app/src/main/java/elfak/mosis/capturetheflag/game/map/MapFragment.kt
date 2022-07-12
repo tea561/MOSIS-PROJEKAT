@@ -48,9 +48,9 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
 class MapFragment : Fragment() {
+    private lateinit var map: MapView
 
     private lateinit var mapViewModel: MapViewModel
-    private lateinit var map: MapView
     private val userViewModel: UserViewModel by activityViewModels()
     private val friendsViewModel: FriendsViewModel by activityViewModels()
     private val gameViewModel: GameViewModel by activityViewModels()
@@ -78,6 +78,7 @@ class MapFragment : Fragment() {
             MapViewModelFactory(requireActivity().application, userViewModel.selectedUser!!.uid)).get(MapViewModel::class.java)
         setHasOptionsMenu(true)
         markerViewModel.getFriendsWithLocations()
+
     }
 
     override fun onCreateView(
@@ -114,13 +115,11 @@ class MapFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         map.onPause()
-        //removeObservers()
     }
 
     override fun onResume() {
         super.onResume()
         map.onResume()
-        //setObservers()
     }
 
     override fun onDestroyView() {
@@ -134,6 +133,32 @@ class MapFragment : Fragment() {
         Log.i("CLICK ON FRIEND", userUid ?: "empty")
     }
 
+    //region Helper Functions
+    private fun initMapView() {
+        val ctx: Context? = activity?.applicationContext
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
+        map = requireView().findViewById(R.id.map)
+
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_DENIED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        else {
+            setMyLocationOverlay()
+        }
+        map.setMultiTouchControls(true)
+        map.controller.setZoom(20.0)
+        val mapEventsOverlay = MapEventsOverlay(mapViewModel)
+        map.overlays.add(mapEventsOverlay)
+    }
+
     @SuppressLint("MissingPermission")
     private fun setMyLocationOverlay() {
         val locationProvider = GpsMyLocationProvider(activity)
@@ -143,28 +168,6 @@ class MapFragment : Fragment() {
         map.overlays.add(myLocationOverlay)
         myLocationOverlay.enableFollowLocation()
         map.controller.setCenter(myLocationOverlay.myLocation)
-    }
-
-    private fun setObservers() {
-        val mapStateObserver = Observer<MapState> { state -> setMapStateObserver(state) }
-        mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver)
-
-        val friendsWithLocationsObserver = Observer<MutableMap<String, UserWithLocation>> { state ->
-            setUserWithLocationsObserver(state)
-        }
-        markerViewModel.friendsWithLocations.observe(viewLifecycleOwner, friendsWithLocationsObserver)
-
-        val filtersObserver = Observer<MutableMap<String, Boolean>> { state ->
-            setFiltersObserver(state)
-        }
-        markerViewModel.filters.observe(viewLifecycleOwner, filtersObserver)
-    }
-
-    private fun removeObservers() {
-        gameViewModel.gameState.removeObservers(viewLifecycleOwner)
-        mapViewModel.mapState.removeObservers(viewLifecycleOwner)
-        markerViewModel.friendsWithLocations.removeObservers(viewLifecycleOwner)
-        markerViewModel.filters.removeObservers(viewLifecycleOwner)
     }
 
     private fun checkLocationServiceRunning(): Boolean {
@@ -177,12 +180,6 @@ class MapFragment : Fragment() {
             }
         }
         return false
-    }
-
-    private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, type: String) {
-        Log.d("MAP Set Marker", "Type: $type")
-        mapViewModel.setPlacingMarkerMapState(type)
-        dialog.dismiss()
     }
 
     private fun resolveMapIcon(type: String) : Drawable? {
@@ -206,7 +203,9 @@ class MapFragment : Fragment() {
         }
         return R.color.black
     }
+    //endregion
 
+    //region FAB Functions
     private fun fabOnClick() {
         val dialog = BottomSheetDialog(requireContext())
         dialog.setCancelable(true)
@@ -235,30 +234,57 @@ class MapFragment : Fragment() {
         dialog.show(activity!!.supportFragmentManager, "MapFiltersDialog")
     }
 
-    private fun initMapView() {
-        val ctx: Context? = activity?.applicationContext
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
-        map = requireView().findViewById(R.id.map)
+    private fun openSetMarkerBottomSheet(dialog: BottomSheetDialog, type: String) {
+        Log.d("MAP Set Marker", "Type: $type")
+        mapViewModel.setPlacingMarkerMapState(type)
+        dialog.dismiss()
+    }
+    //endregion
 
+    //region Observer Functions
+    private fun setObservers() {
+        val mapStateObserver = Observer<MapState> { state -> setMapStateObserver(state) }
+        mapViewModel.mapState.observe(viewLifecycleOwner, mapStateObserver)
 
-        if (ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_DENIED
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        val friendsWithLocationsObserver = Observer<MutableMap<String, UserWithLocation>> { state ->
+            setUserWithLocationsObserver(state)
         }
-        else {
-            setMyLocationOverlay()
+        markerViewModel.friendsWithLocations.observe(viewLifecycleOwner, friendsWithLocationsObserver)
+
+        val teamBarriersObserver = Observer<MutableMap<String, MapObject>> { state ->
+            setTeamBarriersObserver(state) }
+        markerViewModel.teamBarriers.observe(viewLifecycleOwner, teamBarriersObserver)
+
+        val enemyBarriersObserver = Observer<MutableMap<String, MapObject>> { state ->
+            setEnemyBarriersObserver(state) }
+        markerViewModel.enemyBarriers.observe(viewLifecycleOwner, enemyBarriersObserver)
+
+        val teamFlagObserver = Observer<MapObject> { state ->
+            setTeamFlagObserver(state) }
+        markerViewModel.teamFlag.observe(viewLifecycleOwner, teamFlagObserver)
+
+        val enemyFlagObserver = Observer<MapObject> { state ->
+            setEnemyFlagObserver(state) }
+        markerViewModel.enemyFlag.observe(viewLifecycleOwner, enemyFlagObserver)
+
+        val filtersObserver = Observer<MutableMap<String, Boolean>> { state ->
+            setFiltersObserver(state)
         }
-        map.setMultiTouchControls(true)
-        map.controller.setZoom(20.0)
-        val mapEventsOverlay = MapEventsOverlay(mapViewModel)
-        map.overlays.add(mapEventsOverlay)
+        markerViewModel.filters.observe(viewLifecycleOwner, filtersObserver)
+    }
+
+    private fun removeObservers() {
+        gameViewModel.gameState.removeObservers(viewLifecycleOwner)
+
+        mapViewModel.mapState.removeObservers(viewLifecycleOwner)
+
+        markerViewModel.friendsWithLocations.removeObservers(viewLifecycleOwner)
+        markerViewModel.teamBarriers.removeObservers(viewLifecycleOwner)
+        markerViewModel.enemyBarriers.removeObservers(viewLifecycleOwner)
+        markerViewModel.teamFlag.removeObservers(viewLifecycleOwner)
+        markerViewModel.enemyFlag.removeObservers(viewLifecycleOwner)
+
+        markerViewModel.filters.removeObservers(viewLifecycleOwner)
     }
 
     private fun setMapStateObserver(state: MapState) {
@@ -276,18 +302,17 @@ class MapFragment : Fragment() {
                 fabFilters.show()
             }
             is MapState.InGame -> {
-                //TODO: get info about game if not present
                 fab.show()
                 fabFilters.show()
             }
             is MapState.PlacingMarker -> {
-                //TODO: idk dal treba nesto
                 fab.hide()
                 fabFilters.hide()
             }
             is MapState.BeginGame -> {
                 val prefs = PreferenceHelper.customPreference(context!!, "User_data")
                 prefs.gameID = gameViewModel.gameUid
+                markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
                     if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
                         val dialog = WaitForFlagDialog()
                         dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
@@ -332,14 +357,23 @@ class MapFragment : Fragment() {
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
             //gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.team, state.latitude, state.longitude)
-
-            mapViewModel.setMapState(MapState.InGame)
+            //mapViewModel.setMapState(MapState.InGame)
+            gameViewModel.objectType = state.type
+            gameViewModel.objectLatitude = state.latitude
+            gameViewModel.objectLongitude = state.longitude
             dialog.dismiss()
             Toast.makeText(
                 requireContext(),
                 "${state.type}, lat: ${state.latitude}, long: ${state.longitude}",
                 Toast.LENGTH_SHORT
             ).show()
+            map.overlays.remove(marker)
+            if (state.type == MapFilters.TeamBarriers.value) {
+                findNavController().navigate(R.id.action_MapFragment_to_SetRiddleFragment)
+            }
+            else {
+                gameViewModel.putGameObjectToDB("", "")
+            }
         }
 
         val btnCancel = view.findViewById<Button>(R.id.btnCancel)
@@ -375,6 +409,7 @@ class MapFragment : Fragment() {
                 "flag, lat: ${state.latitude}, long: ${state.longitude}",
                 Toast.LENGTH_SHORT
             ).show()
+            map.overlays.remove(marker)
             findNavController().navigate(R.id.action_MapFragment_to_SetRiddleFragment)
         }
 
@@ -391,6 +426,30 @@ class MapFragment : Fragment() {
     private fun setUserWithLocationsObserver(state: MutableMap<String, UserWithLocation>) {
         if (markerViewModel.filters.value?.get(MapFilters.Friends.value) == true) {
             drawFriends(state)
+        }
+    }
+
+    private fun setTeamBarriersObserver(state: MutableMap<String, MapObject>) {
+        if (markerViewModel.filters.value?.get(MapFilters.TeamBarriers.value) == true) {
+            drawTeamBarriers(state)
+        }
+    }
+
+    private fun setEnemyBarriersObserver(state: MutableMap<String, MapObject>) {
+        if (markerViewModel.filters.value?.get(MapFilters.EnemyBarriers.value) == true) {
+            drawEnemyBarriers(state)
+        }
+    }
+
+    private fun setTeamFlagObserver(state: MapObject) {
+        if (markerViewModel.filters.value?.get(MapFilters.TeamFlag.value) == true) {
+            drawTeamFlag(state)
+        }
+    }
+
+    private fun setEnemyFlagObserver(state: MapObject) {
+        if (markerViewModel.filters.value?.get(MapFilters.EnemyFlag.value) == true) {
+            drawEnemyFlag(state)
         }
     }
 
@@ -417,7 +476,7 @@ class MapFragment : Fragment() {
         }
 
         if (state[MapFilters.TeamBarriers.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
-            //TODO: draw team barriers on map
+            markerViewModel.teamBarriers.value?.let { drawTeamBarriers(it) }
         }
         else {
             teamBarriersMarkers.forEach { marker ->
@@ -427,7 +486,7 @@ class MapFragment : Fragment() {
         }
 
         if (state[MapFilters.EnemyBarriers.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
-            //TODO: draw team barriers on map
+            markerViewModel.enemyBarriers.value?.let { drawEnemyBarriers(it) }
         }
         else {
             enemyBarriersMarkers.forEach { marker ->
@@ -437,7 +496,7 @@ class MapFragment : Fragment() {
         }
 
         if (state[MapFilters.TeamFlag.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
-            //TODO: draw team flag on map
+            markerViewModel.teamFlag.value?.let { drawTeamFlag(it) }
         }
         else {
             if (teamFlagMarker != null) {
@@ -447,7 +506,7 @@ class MapFragment : Fragment() {
         }
 
         if (state[MapFilters.EnemyFlag.value] == true && mapViewModel.mapState.value !is MapState.Idle) {
-            //TODO: draw enemy flag on map
+            markerViewModel.enemyFlag.value?.let { drawEnemyFlag(it) }
         }
         else {
             if (enemyFlagMarker != null) {
@@ -456,7 +515,9 @@ class MapFragment : Fragment() {
             enemyFlagMarker = null
         }
     }
+    //endregion
 
+    //region Draw Markers
     private fun drawFriends(friends: MutableMap<String, UserWithLocation>) {
         friendsMarkers.forEach { marker ->
             map.overlays.remove(marker)
@@ -493,7 +554,7 @@ class MapFragment : Fragment() {
                 val marker = Marker(map)
                 marker.position = GeoPoint(barrier.latitude, barrier.longitude)
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon = context!!.getDrawable(R.drawable.ic_road_barrier_solid)
                 marker.icon.setTint(R.color.blue)
                 marker.setInfoWindow(null)
                 teamBarriersMarkers.add(marker)
@@ -513,7 +574,7 @@ class MapFragment : Fragment() {
                 val marker = Marker(map)
                 marker.position = GeoPoint(barrier.latitude, barrier.longitude)
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                marker.icon = context!!.getDrawable(R.drawable.ic_person_solid)
+                marker.icon = context!!.getDrawable(R.drawable.ic_burst_solid)
                 marker.icon.setTint(R.color.blue)
                 marker.setInfoWindow(null)
                 enemyBarriersMarkers.add(marker)
@@ -522,11 +583,40 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun drawTeamFlag() {
-        //TODO: implement
+    private fun drawTeamFlag(state: MapObject) {
+        if (teamFlagMarker != null) {
+            map.overlays.remove(teamFlagMarker)
+        }
+        teamFlagMarker = null
+
+        if (state != null) {
+            val marker = Marker(map)
+            marker.position = GeoPoint(state.latitude, state.longitude)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            marker.icon = context!!.getDrawable(R.drawable.ic_flag_solid)
+            marker.icon.setTint(R.color.blue)
+            marker.setInfoWindow(null)
+            teamFlagMarker = marker
+            map.overlays.add(marker)
+        }
     }
 
-    private fun drawEnemyFlag() {
-        //TODO: implement
+    private fun drawEnemyFlag(state: MapObject) {
+        if (enemyFlagMarker != null) {
+            map.overlays.remove(enemyFlagMarker)
+        }
+        enemyFlagMarker = null
+
+        if (state != null) {
+            val marker = Marker(map)
+            marker.position = GeoPoint(state.latitude, state.longitude)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            marker.icon = context!!.getDrawable(R.drawable.ic_location_crosshairs_solid)
+            marker.icon.setTint(R.color.blue)
+            marker.setInfoWindow(null)
+            enemyFlagMarker = marker
+            map.overlays.add(marker)
+        }
     }
+    //endregion
 }

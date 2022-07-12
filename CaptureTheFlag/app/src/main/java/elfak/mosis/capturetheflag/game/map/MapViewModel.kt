@@ -34,8 +34,6 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
     private var _friends = MutableLiveData<MutableMap<String,UserWithLocation>>()
     var friends: LiveData<MutableMap<String,UserWithLocation>> = _friends
 
-    var gameBeginning = true
-
     init {
         _friends.value = mutableMapOf()
         subscribeToLocationsInDB()
@@ -49,10 +47,6 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
 
     fun setPlacingMarkerMapState(type: String) {
         _mapState.value = MapState.PlacingMarker(type)
-    }
-
-    fun setCooldownMapState(cooldownTime: Int) {
-        _mapState.value = MapState.Cooldown(cooldownTime)
     }
 
     fun setMapState(state: MapState) {
@@ -104,8 +98,12 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
         dbRef.child("games").child(gameID).child("flagCount").addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
-                    val flagCount = snapshot.getValue(Int::class.java)
-                    if(flagCount == 2 && mapState.value == MapState.WaitingForFlags){
+                    val flagCountValue = snapshot.getValue(Long::class.java)
+                    val flagCount = flagCountValue ?: 0.toLong()
+                    if(
+                        flagCount == 2.toLong()
+                        && (mapState.value == MapState.WaitingForFlags
+                                || mapState.value == MapState.BeginGame)){
                         _mapState.value = MapState.InGame
                     }
                 }
@@ -136,7 +134,6 @@ class MapViewModelFactory(private val app: Application, private val uid: String)
 sealed class MapState {
     object Idle: MapState()
     object InGame: MapState()
-    class Cooldown(val time: Number = 120): MapState()
     class PlacingMarker(val type: String = "") : MapState()
     class ConfirmingMarker(val type: String = "", val latitude: Double, val longitude: Double) : MapState()
     object BeginGame: MapState()
@@ -145,22 +142,3 @@ sealed class MapState {
     object WaitingForFlags: MapState()
     object SolvingRiddle: MapState()
 }
-
-/*
-class MapFilters {
-    val friends = MutableLiveData<Boolean>()
-    val players = MutableLiveData<Boolean>()
-    val teamBarriers = MutableLiveData<Boolean>()
-    val teamFlag = MutableLiveData<Boolean>()
-    val enemyBarriers = MutableLiveData<Boolean>()
-    val enemyFlag = MutableLiveData<Boolean>()
-
-    init {
-        friends.value = true
-        players.value = true
-        teamBarriers.value = true
-        teamFlag.value = true
-        enemyBarriers.value = true
-        enemyFlag.value = true
-    }
-}*/

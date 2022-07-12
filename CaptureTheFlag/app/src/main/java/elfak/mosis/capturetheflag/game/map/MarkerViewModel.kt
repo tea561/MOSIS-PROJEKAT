@@ -29,6 +29,18 @@ class MarkerViewModel : ViewModel() {
     private var _friendsWithLocations = MutableLiveData<MutableMap<String, UserWithLocation>>()
     val friendsWithLocations: LiveData<MutableMap<String, UserWithLocation>> = _friendsWithLocations
 
+    private var _teamBarriers = MutableLiveData<MutableMap<String, MapObject>>()
+    val teamBarriers: LiveData<MutableMap<String, MapObject>> = _teamBarriers
+
+    private var _enemyBarriers = MutableLiveData<MutableMap<String, MapObject>>()
+    val enemyBarriers: LiveData<MutableMap<String, MapObject>> = _enemyBarriers
+
+    private var _teamFlag = MutableLiveData<MapObject>()
+    val teamFlag: LiveData<MapObject> = _teamFlag
+
+    private var _enemyFlag = MutableLiveData<MapObject>()
+    val enemyFlag: LiveData<MapObject> = _enemyFlag
+
     private var _filters = MutableLiveData<MutableMap<String, Boolean>>()
     val filters: LiveData<MutableMap<String, Boolean>> = _filters
 
@@ -38,6 +50,8 @@ class MarkerViewModel : ViewModel() {
             MapFilters.TeamBarriers.value to true, MapFilters.EnemyBarriers.value to true,
             MapFilters.TeamFlag.value to true, MapFilters.EnemyFlag.value to true)
         _friendsWithLocations.value = mutableMapOf()
+        _teamBarriers.value = mutableMapOf()
+        _enemyBarriers.value = mutableMapOf()
     }
 
     fun getFriendsWithLocations() {
@@ -68,23 +82,27 @@ class MarkerViewModel : ViewModel() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
-
+                onChildDBGameObjects(dataSnapshot, previousChildName)
             }
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
-
+                onChildDBGameObjects(dataSnapshot, previousChildName)
             }
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
+                onChildRemovedGameObject(dataSnapshot)
             }
             override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(ContentValues.TAG, "onChildMoved:" + dataSnapshot.key!!)
             }
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
+                Log.e(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
             }
         }
-        dbRef.child("games").child(gameUid).child("objects").addChildEventListener(childEventListener)
+        dbRef.child("games")
+            .child(gameUid)
+            .child(team)
+            .child("objects").addChildEventListener(childEventListener)
     }
 
     fun setFilters(newFilters: MutableMap<String, Boolean>) {
@@ -101,10 +119,57 @@ class MarkerViewModel : ViewModel() {
 
     private fun onChildDBGameObjects(dataSnapshot: DataSnapshot, previousChildName: String?) {
         val key = dataSnapshot.key
+        val gameObject = MapObject.fromMap(dataSnapshot.value as Map<String, Any?>)
+
+        when (gameObject.type) {
+            MapFilters.TeamBarriers.value -> {
+                val teamBarriersList = _teamBarriers.value
+                teamBarriersList!![key!!] = gameObject
+                _teamBarriers.value = teamBarriersList
+            }
+            MapFilters.EnemyBarriers.value -> {
+                val enemyBarriersList = _enemyBarriers.value
+                enemyBarriersList!![key!!] = gameObject
+                _enemyBarriers.value = enemyBarriersList
+            }
+            MapFilters.TeamFlag.value -> {
+                _teamFlag.value = gameObject
+            }
+            MapFilters.EnemyFlag.value -> {
+                _enemyFlag.value = gameObject
+            }
+            else -> {
+                // ovo ne bi trebalo da se desi
+                Log.d("MARKERS", "Unknown map object type: ${gameObject.type}")
+            }
+        }
+    }
+
+    private fun onChildRemovedGameObject(dataSnapshot: DataSnapshot) {
+        val key = dataSnapshot.key
         val gameObject = dataSnapshot.value as MapObject
 
         when (gameObject.type) {
-
+            MapFilters.TeamBarriers.value -> {
+                val teamBarriersList = _teamBarriers.value
+                teamBarriersList!!.remove(key)
+                _teamBarriers.value = teamBarriersList
+            }
+            MapFilters.EnemyBarriers.value -> {
+                val enemyBarriersList = _enemyBarriers.value
+                enemyBarriersList!!.remove(key)
+                _enemyBarriers.value = enemyBarriersList
+            }
+            MapFilters.TeamFlag.value -> {
+                _teamFlag.value = null
+            }
+            MapFilters.EnemyFlag.value -> {
+                _enemyFlag.value = null
+            }
+            else -> {
+                // ovo ne bi trebalo da se desi
+                Log.d("MARKERS", "Unknown map object type: ${gameObject.type}")
+            }
         }
     }
 
