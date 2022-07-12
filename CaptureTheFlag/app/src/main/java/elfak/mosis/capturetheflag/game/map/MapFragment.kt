@@ -369,6 +369,7 @@ class MapFragment : Fragment() {
             ).show()
             map.overlays.remove(marker)
             if (state.type == MapFilters.TeamBarriers.value) {
+                mapViewModel.setMapState(MapState.InGame)
                 findNavController().navigate(R.id.action_MapFragment_to_SetRiddleFragment)
             }
             else {

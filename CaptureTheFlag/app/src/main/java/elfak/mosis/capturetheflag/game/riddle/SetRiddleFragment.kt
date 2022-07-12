@@ -31,6 +31,7 @@ class SetRiddleFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        gameViewModel.resetUploadState()
     }
 
     override fun onCreateView(

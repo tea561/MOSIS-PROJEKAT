@@ -44,6 +44,7 @@ class GameViewModel : ViewModel() {
     var objectType: String = ""
     var objectLatitude: Double = 0.0
     var objectLongitude: Double = 0.0
+    var objectID: String = ""
 
     private val _uploadState by lazy { MutableLiveData<StoreUploadState>(StoreUploadState.Idle) }
     val uploadState: LiveData<StoreUploadState> = _uploadState
@@ -56,6 +57,10 @@ class GameViewModel : ViewModel() {
 
     private val storage = Firebase.storage("gs://capturetheflag-56f1c.appspot.com")
     private val storageRef = storage.reference
+
+    fun resetUploadState() {
+        _uploadState.value = StoreUploadState.Idle
+    }
 
     fun createGame(team1: String, team2: String): String{
         val uniqueID: String = UUID.randomUUID().toString()
@@ -138,10 +143,10 @@ class GameViewModel : ViewModel() {
     fun putGameObjectToDB(objectImgUrl: String, answer: String) {
         //TODO: put to DB
         val gameUid = gameUid
-        val uniqueID: String = UUID.randomUUID().toString()
+        val objectUid = objectID
         val timestamp = System.currentTimeMillis()
         val mapObject = MapObject(
-            uniqueID,
+            objectUid,
             objectLatitude,
             objectLongitude,
             objectType,
@@ -153,9 +158,9 @@ class GameViewModel : ViewModel() {
         dbRef.child("games").child(gameUid)
             .child(team)
             .child("objects")
-            .child(uniqueID).setValue(mapObject)
+            .child(objectUid).setValue(mapObject)
             .addOnSuccessListener {
-                Log.i("GAME", "Object of type ${mapObject.type} inserted into DB with uid: $uniqueID .")
+                Log.i("GAME", "Object of type ${mapObject.type} inserted into DB with uid: $objectUid .")
                 if(mapObject.type == MapFilters.TeamFlag.value)
                 {
                     dbRef.child("games").child(gameUid).child("flagCount").get().addOnSuccessListener {
@@ -184,7 +189,9 @@ class GameViewModel : ViewModel() {
 
     fun uploadRiddlePhoto() {
         //TODO: uzeti id map objecta
-        val photoRef = storageRef.child("riddlePictures").child("todo.jpg")
+        val uniqueID: String = UUID.randomUUID().toString()
+        objectID = uniqueID
+        val photoRef = storageRef.child("riddlePictures").child("$uniqueID.jpg")
         val baos = ByteArrayOutputStream()
         val bitmap = image
         bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
