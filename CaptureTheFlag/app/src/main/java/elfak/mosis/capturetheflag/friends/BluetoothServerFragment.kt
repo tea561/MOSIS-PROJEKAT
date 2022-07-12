@@ -114,13 +114,17 @@ class BluetoothServerFragment : Fragment() {
 
             private val mmInStream: InputStream = mmSocket.inputStream
             private val mmOutStream: OutputStream = mmSocket.outputStream
-            private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
+            private val mmBuffer: ByteArray = ByteArray(28) // mmBuffer store for the stream
+            val b = userViewModel.selectedUser!!.uid.encodeToByteArray()
+            val mmv = b.size.toString()
+
 
             override fun run() {
                 var numBytes: Int // bytes returned from read()
-                var friendUid: String = ""
+
                 val currentUserUid: String = userViewModel.selectedUser?.uid ?: ""
                 val end: String = "end"
+                Log.i("FRIEND", mmv)
 
                 // Keep listening to the InputStream until an exception occurs.
                 while (true) {
@@ -130,24 +134,25 @@ class BluetoothServerFragment : Fragment() {
                     } catch (e: IOException) {
                         Log.d("Bluetooth Server", "Input stream was disconnected", e)
                         break
+                    } finally {
+                        if (mmBuffer.isNotEmpty()) {
+                            val friendUid = mmBuffer.decodeToString()
+                            Log.i("FRIENDS", "Friend: $friendUid")
+                            friendsViewModel.addFriend(currentUserUid, friendUid)
+                            friendsViewModel.addFriend(friendUid, currentUserUid)
+                        }
                     }
-
-                    if(mmBuffer.isNotEmpty()) {
-                        friendUid = String(mmBuffer)
-                        break
-                    }
                 }
 
-                try{
-                    mmOutStream.write(currentUserUid.toByteArray())
-                    mmOutStream.write(end.toByteArray())
-                }
-                catch (e: IOException){
-                    Log.e(ContentValues.TAG, "Error occurred when sending data", e)
-                }
+//                try{
+//                    mmOutStream.write(currentUserUid.toByteArray())
+//                    mmOutStream.write(end.toByteArray())
+//                }
+//                catch (e: IOException){
+//                    Log.e(ContentValues.TAG, "Error occurred when sending data", e)
+//                }
 
-                mmSocket.close()
-                friendsViewModel.addFriend(currentUserUid, friendUid)
+                //mmSocket.close()
             }
 
 

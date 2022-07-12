@@ -177,39 +177,42 @@ class BluetoothClientFragment : Fragment() {
         {
             private val mmInStream: InputStream = mmSocket.inputStream
             private val mmOutStream: OutputStream = mmSocket.outputStream
-            private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
+            private val mmBuffer: ByteArray = ByteArray(28) // mmBuffer store for the stream
 
 
             override fun run() {
                 var numBytes: Int // bytes returned from read()
                 var friendUid = ""
                 val uid: String = userViewModel.selectedUser?.uid ?: ""
-
+                Log.i("FRIEND", "Client: $uid")
+                val b = uid.encodeToByteArray()
+                val c = b.decodeToString()
+                Log.i("FRIEND-CLIENT", b.size.toString())
                 //send uid
                 try{
-                    mmOutStream.write(uid.toByteArray())
+                    mmOutStream.write(uid.encodeToByteArray())
                 } catch (e: IOException){
                     Log.e(TAG, "Error occurred when sending data", e)
                 }
 
                 // Keep listening to the InputStream until an exception occurs.
-                while (true) {
-                    // Read from the InputStream.
-                    numBytes = try {
-                        mmInStream.read(mmBuffer)
-                    } catch (e: IOException) {
-                        Log.d(TAG, "Input stream was disconnected", e)
-                        break
-                    }
+//                while (true) {
+//                    // Read from the InputStream.
+//                    numBytes = try {
+//                        mmInStream.read(mmBuffer)
+//                    } catch (e: IOException) {
+//                        Log.d(TAG, "Input stream was disconnected", e)
+//                        break
+//                    }
+//
+//                    if(String(mmBuffer) != "end")
+//                        friendUid = String(mmBuffer)
+//                    else
+//                        break
+//                }
 
-                    if(String(mmBuffer) != "end")
-                        friendUid = String(mmBuffer)
-                    else
-                        break
-                }
-
-                mmSocket.close()
-                friendsViewModel.addFriend(uid, friendUid)
+                //mmSocket.close()
+                //friendsViewModel.addFriend(uid, friendUid)
 
             }
 
