@@ -14,6 +14,7 @@ class WaitForFlagDialog: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
+
             builder.setTitle("Team Flag")
                 .setMessage("Before starting the game, " +
                         "the first player to enter the team needs to set the team flag. " +

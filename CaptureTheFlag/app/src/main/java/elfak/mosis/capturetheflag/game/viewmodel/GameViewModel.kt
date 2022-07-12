@@ -143,7 +143,11 @@ class GameViewModel : ViewModel() {
     fun putGameObjectToDB(objectImgUrl: String, answer: String) {
         //TODO: put to DB
         val gameUid = gameUid
-        val objectUid = objectID
+        var objectUid = objectID
+        if ( objectUid.isEmpty()) {
+            val uniqueID: String = UUID.randomUUID().toString()
+            objectUid = uniqueID
+        }
         val timestamp = System.currentTimeMillis()
         val mapObject = MapObject(
             objectUid,

@@ -44,6 +44,8 @@ class MarkerViewModel : ViewModel() {
     private var _filters = MutableLiveData<MutableMap<String, Boolean>>()
     val filters: LiveData<MutableMap<String, Boolean>> = _filters
 
+    private var isSubscribedToGameObjects = false
+
     init {
         _filters.value = mutableMapOf(
             MapFilters.Friends.value to true, MapFilters.Players.value to true,
@@ -79,30 +81,34 @@ class MarkerViewModel : ViewModel() {
     }
 
     fun getGameObjects(gameUid: String, team: String) {
-        val childEventListener = object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
-                onChildDBGameObjects(dataSnapshot, previousChildName)
+
+        if (!isSubscribedToGameObjects) {
+            val childEventListener = object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                    Log.d(ContentValues.TAG, "onChildAdded:" + dataSnapshot.key!!)
+                    onChildDBGameObjects(dataSnapshot, previousChildName)
+                }
+                override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                    Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
+                    onChildDBGameObjects(dataSnapshot, previousChildName)
+                }
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
+                    onChildRemovedGameObject(dataSnapshot)
+                }
+                override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                    Log.d(ContentValues.TAG, "onChildMoved:" + dataSnapshot.key!!)
+                }
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
+                }
             }
-            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(ContentValues.TAG, "onChildChanged: ${dataSnapshot.key}")
-                onChildDBGameObjects(dataSnapshot, previousChildName)
-            }
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(ContentValues.TAG, "onChildRemoved:" + dataSnapshot.key!!)
-                onChildRemovedGameObject(dataSnapshot)
-            }
-            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(ContentValues.TAG, "onChildMoved:" + dataSnapshot.key!!)
-            }
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(ContentValues.TAG, "postComments:onCancelled", databaseError.toException())
-            }
+            dbRef.child("games")
+                .child(gameUid)
+                .child(team)
+                .child("objects").addChildEventListener(childEventListener)
+            isSubscribedToGameObjects = true
         }
-        dbRef.child("games")
-            .child(gameUid)
-            .child(team)
-            .child("objects").addChildEventListener(childEventListener)
     }
 
     fun setFilters(newFilters: MutableMap<String, Boolean>) {

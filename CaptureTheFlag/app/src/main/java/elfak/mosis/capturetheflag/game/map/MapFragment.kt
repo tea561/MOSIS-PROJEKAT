@@ -302,6 +302,10 @@ class MapFragment : Fragment() {
                 fabFilters.show()
             }
             is MapState.InGame -> {
+                markerViewModel.filters.value?.let { setFiltersObserver(it) }
+                markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
+                val prefs = PreferenceHelper.customPreference(context!!, "User_data")
+                prefs.gameID = gameViewModel.gameUid
                 fab.show()
                 fabFilters.show()
             }
@@ -357,7 +361,7 @@ class MapFragment : Fragment() {
         val btnAccept = view.findViewById<Button>(R.id.btnAccept)
         btnAccept.setOnClickListener {
             //gameViewModel.putGameObjectToDB(gameViewModel.gameUid, state.type, gameViewModel.team, state.latitude, state.longitude)
-            //mapViewModel.setMapState(MapState.InGame)
+            mapViewModel.setMapState(MapState.InGame)
             gameViewModel.objectType = state.type
             gameViewModel.objectLatitude = state.latitude
             gameViewModel.objectLongitude = state.longitude
@@ -369,7 +373,6 @@ class MapFragment : Fragment() {
             ).show()
             map.overlays.remove(marker)
             if (state.type == MapFilters.TeamBarriers.value) {
-                mapViewModel.setMapState(MapState.InGame)
                 findNavController().navigate(R.id.action_MapFragment_to_SetRiddleFragment)
             }
             else {
@@ -416,6 +419,7 @@ class MapFragment : Fragment() {
 
         val btnCancel = view.findViewById<Button>(R.id.btnCancel)
         btnCancel.setOnClickListener {
+            mapViewModel.setMapState(MapState.PlacingFlag)
             dialog.dismiss()
             Toast.makeText(requireContext(), "NO.", Toast.LENGTH_SHORT).show()
             map.overlays.remove(marker)
@@ -456,7 +460,7 @@ class MapFragment : Fragment() {
 
     private fun setFiltersObserver(state: MutableMap<String, Boolean>) {
         //TODO: go through each value and redraw markers
-        if (state[MapFilters.Friends.value] == true && mapViewModel.mapState.value is MapState.Idle) {
+        if (state[MapFilters.Friends.value] == true/* && mapViewModel.mapState.value is MapState.Idle*/) {
             markerViewModel.friendsWithLocations.value?.let { drawFriends(it) }
         }
         else {

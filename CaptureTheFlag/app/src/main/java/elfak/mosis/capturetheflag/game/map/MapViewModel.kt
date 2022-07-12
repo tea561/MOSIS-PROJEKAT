@@ -103,8 +103,11 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
                     if(
                         flagCount == 2.toLong()
                         && (mapState.value == MapState.WaitingForFlags
-                                || mapState.value == MapState.BeginGame)){
+                                || mapState.value == MapState.Idle)){
                         _mapState.value = MapState.InGame
+                    }
+                    else if (flagCount == 0.toLong()) {
+                        _mapState.value = MapState.BeginGame
                     }
                 }
                 catch (e: DatabaseException){
