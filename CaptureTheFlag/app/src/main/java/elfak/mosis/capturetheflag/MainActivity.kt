@@ -31,6 +31,7 @@ import elfak.mosis.capturetheflag.model.MainViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.locationEnabled
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
 
 
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceHelper.customPreference(this, "User_data")
         prefs.isAppActive = false
 
-        if (!mainViewModel.keepLocationServiceAlive) {
+        if (!prefs.locationEnabled) {
             stopService(Intent(this, LocationService().javaClass))
         }
     }

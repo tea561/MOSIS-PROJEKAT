@@ -10,7 +10,8 @@
     <ImageView
         android:id="@+id/imageProfile"
         android:layout_width="427dp"
-        android:layout_height="240dp"
+        android:layout_height="181dp"
+        android:layout_gravity="center"
         tools:src="@tools:sample/avatars" />
 
     <TextView
@@ -31,25 +32,26 @@
         android:layout_marginStart="14dp"
         android:text="@string/first_and_last_name"
         android:textColor="@color/black"
-        android:textSize="34sp" />
+        android:textSize="24sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputAboutMeProfile"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="373dp"
-        android:layout_height="105dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="19dp"
+        android:layout_gravity="center"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="22dp"
+        android:gravity="center"
         android:hint="About me">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputDesc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="65dp"
             android:enabled="false"
             android:inputType="none"
             android:textColor="@color/black" />
@@ -57,9 +59,9 @@
 
     <Button
         android:id="@+id/buttonEditYourProfile"
-        android:layout_width="373dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="19dp"
+        android:layout_gravity="center"
         android:backgroundTint="#00FFFFFF"
         android:drawableEnd="@drawable/baseline_navigate_next_24"
         android:paddingTop="8dp"
@@ -73,9 +75,9 @@
 
     <Button
         android:id="@+id/buttonChangePassword"
-        android:layout_width="373dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="19dp"
+        android:layout_gravity="center"
         android:backgroundTint="#00FFFFFF"
         android:drawableEnd="@drawable/baseline_navigate_next_24"
         android:paddingTop="8dp"
@@ -83,6 +85,18 @@
         android:text="@string/change_your_password"
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <Switch
+        android:id="@+id/switchLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:minHeight="48dp"
+        android:paddingStart="14dp"
+        android:text="Toggle background location"
         android:textColor="@color/blue"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -95,7 +109,7 @@
         android:id="@+id/buttonLogOut"
         android:layout_width="105dp"
         android:layout_height="48dp"
-        android:layout_marginStart="153dp"
+        android:layout_gravity="center"
         android:backgroundTint="@color/orange"
         android:text="@string/log_out"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"

@@ -46,8 +46,8 @@ class GameViewModel : ViewModel() {
     var triggeredRiddleImage: LiveData<Bitmap> = _triggeredRiddleImage
     private val _triggeredRiddleAnswer by lazy { MutableLiveData<String>()}
     var triggeredRiddleAnswer: LiveData<String> = _triggeredRiddleAnswer
-    private val _userRank by lazy { MutableLiveData<Int>(0)}
-    var userRank: LiveData<Int> = _userRank
+
+
     private val _winner by lazy { MutableLiveData<String>("")}
     var winner: LiveData<String> = _winner
 
@@ -56,7 +56,7 @@ class GameViewModel : ViewModel() {
 
     var riddleType: String = ""
 
-    lateinit var gameUid: String
+    var gameUid: String = ""
     var team: String = ""
     var opposingTeamName: String = ""
 
@@ -333,13 +333,6 @@ class GameViewModel : ViewModel() {
         dbRef.child("games").child(gameUid).child("winner").setValue(team)
     }
 
-    fun updateUserRank(increment: Int, userID: String) {
-        var rank = _userRank.value
-        rank = rank?.plus(increment)
-        _userRank.value = rank
-        dbRef.child("users").child(userID).child("rank").setValue(rank?.toLong())
-    }
-
     fun deleteRiddleFromDB(riddleID: String, team: String, gameID: String) {
         dbRef.child("games").child(gameID).child(team).child("objects").child(riddleID).setValue(null)
         dbRef.child("locationsGeoFire").child(riddleID).setValue(null)
@@ -354,14 +347,6 @@ class GameViewModel : ViewModel() {
         return randomString
     }
 
-}
-
-sealed class GameState {
-    object PlacingFlag: GameState()
-    object Playing : GameState()
-    object Cooldown : GameState()
-    object SolvingRiddle : GameState()
-    //class UploadError(val message: String? = null) : StoreUploadState()
 }
 
 sealed class FindGameState {

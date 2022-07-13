@@ -65,6 +65,7 @@ class SignupFragment : Fragment() {
         val buttonSignup : Button = requireView().findViewById(R.id.buttonSignup)
         buttonSignup.isEnabled = false
 
+
         inputUsername.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 enableSignupButton(buttonSignup, inputsList)
@@ -121,6 +122,10 @@ class SignupFragment : Fragment() {
             val user = User(firstName, lastName, phoneNum, "", "", username, "")
 
             userViewModel.signupUser(user, password)
+        }
+
+        binding.buttonLogin.setOnClickListener {
+            findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)
         }
 
         val authStateObserver = Observer<AuthState> { state ->

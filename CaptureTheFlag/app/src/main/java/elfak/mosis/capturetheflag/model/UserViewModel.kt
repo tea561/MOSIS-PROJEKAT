@@ -36,6 +36,8 @@ class UserViewModel : ViewModel() {
     val authState: LiveData<AuthState> = _authState
     private val _uploadState by lazy { MutableLiveData<StoreUploadState>(StoreUploadState.Idle) }
     val uploadState: LiveData<StoreUploadState> = _uploadState
+    private val _userRank by lazy { MutableLiveData(0)}
+    var userRank: LiveData<Int> = _userRank
 
     private var auth: FirebaseAuth = Firebase.auth
     private val database = Firebase.database
@@ -58,6 +60,7 @@ class UserViewModel : ViewModel() {
                                     addUserToDB(user)
                                     Log.i("AUTH", "Signup Successful: ${user.username}, phone ${user.phoneNum}")
                                     selectedUser = user
+                                    _userRank.value = selectedUser?.rank
                                     _authState.value = AuthState.Success
                                 } else {
                                     task.exception?.let {
@@ -91,6 +94,7 @@ class UserViewModel : ViewModel() {
                                     val currentUser = snapshot.child(uid).getValue(User::class.java)
                                     currentUser?.uid = uid
                                     selectedUser = currentUser
+                                    _userRank.value = selectedUser?.rank
                                     Log.i("AUTH", "Login Successful: ${currentUser!!.username}, ${currentUser.uid}")
                                     _authState.value = AuthState.Success
                                 } else {
@@ -105,6 +109,14 @@ class UserViewModel : ViewModel() {
                         }
                     }
                 }
+        }
+    }
+
+    fun logoutUser() {
+        if (selectedUser != null) {
+            _authState.value = AuthState.Idle
+            selectedUser = null
+            auth.signOut()
         }
     }
 
@@ -162,6 +174,13 @@ class UserViewModel : ViewModel() {
                     StoreUploadState.Success("Upload successful with image URL: $photoUrl")
             }
         }
+    }
+
+    fun updateUserRank(increment: Int, userID: String) {
+        var rank = _userRank.value
+        rank = rank?.plus(increment)
+        _userRank.value = rank
+        dbRef.child("users").child(userID).child("rank").setValue(rank?.toLong())
     }
 
     fun getLocationForUser(userID: String): FirebaseLocation? {

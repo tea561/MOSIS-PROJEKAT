@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -173,7 +174,6 @@ class MapFragment : Fragment() {
 
     private fun checkLocationServiceRunning(): Boolean {
         val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        //FIXME: fix service starting while already running
         for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
             if (LocationService::class.simpleName == service.service.className) {
                 Log.e("MAP", "Location Service already running.")
@@ -277,6 +277,11 @@ class MapFragment : Fragment() {
             setWinnerObserver(state)
         }
         gameViewModel.winner.observe(viewLifecycleOwner, winnerObserver)
+
+        val rankObserver = Observer<Int> { state ->
+            setRankObserver(state)
+        }
+        userViewModel.userRank.observe(viewLifecycleOwner, rankObserver)
     }
 
     private fun removeObservers() {
@@ -543,6 +548,11 @@ class MapFragment : Fragment() {
             setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM LOST"))
             findNavController().navigate(R.id.action_MapFragment_to_GameOverFragment)
         }
+    }
+
+    private fun setRankObserver(state: Int) {
+        val textView = requireView().findViewById<TextView>(R.id.textRank)
+        textView.text = state.toString()
     }
 
     //endregion

@@ -36,7 +36,8 @@
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="match_parent"
-        android:layout_height="341dp"
+        android:layout_height="313dp"
+        android:layout_gravity="center_horizontal"
         android:src="@drawable/intro1" />
 
     <Button
@@ -68,6 +69,7 @@
             android:id="@+id/textInputAnswer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
 

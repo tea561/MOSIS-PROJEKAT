@@ -2,36 +2,38 @@ package elfak.mosis.capturetheflag.profile
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.viewbinding.ViewBindings
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import elfak.mosis.capturetheflag.R
-import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
 import elfak.mosis.capturetheflag.databinding.FragmentProfileForUserBinding
+import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
-import java.lang.Exception
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.locationEnabled
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 import java.util.concurrent.Executors
+
 
 class ProfileForUserFragment : Fragment() {
 
     private var _binding: FragmentProfileForUserBinding? = null
     private val binding get() = _binding!!
     private val userViewModel: UserViewModel by activityViewModels()
+    private val gameViewModel: GameViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +58,7 @@ class ProfileForUserFragment : Fragment() {
         val username: TextView = requireView().findViewById<TextView>(R.id.textViewUsername)
         val firstAndLastName: TextView = requireView().findViewById<TextView>(R.id.textViewFirstAndLastName)
         val aboutMeDesc: EditText = requireView().findViewById<TextInputEditText>(R.id.textInputDesc)
-
+        val switchLocation: Switch = requireView().findViewById(R.id.switchLocation)
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -77,7 +79,6 @@ class ProfileForUserFragment : Fragment() {
             }
         }
 
-
         username.text = userViewModel.selectedUser?.username ?: ""
         firstAndLastName.text = "${userViewModel.selectedUser?.firstName} ${userViewModel.selectedUser?.lastName}"
         aboutMeDesc.setText(userViewModel.selectedUser?.desc)
@@ -88,6 +89,19 @@ class ProfileForUserFragment : Fragment() {
 
         binding.buttonChangePassword.setOnClickListener {
             findNavController().navigate(R.id.action_ProfileForUserFragment_to_ChangePasswordFragment)
+        }
+        val prefs = context?.let { PreferenceHelper.customPreference(it, "User_data") }
+        switchLocation.isChecked = prefs?.locationEnabled == true
+        switchLocation.setOnCheckedChangeListener { _, isChecked ->
+            prefs?.locationEnabled = isChecked
+        }
+
+        binding.buttonLogOut.setOnClickListener {
+            prefs?.userId = ""
+            prefs?.gameID = ""
+            userViewModel.logoutUser()
+            gameViewModel.resetGame()
+            findNavController().navigate(R.id.action_ProfileForUserFragment_to_LoginFragment)
         }
     }
 

@@ -46,4 +46,26 @@
         app:srcCompat="@drawable/baseline_pin_drop_24"
         app:tint="@android:color/white" />
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="@color/blue"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="5dp">
+
+        <TextView
+            android:id="@+id/textRank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:text="TextView"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
 </FrameLayout>

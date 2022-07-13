@@ -26,6 +26,8 @@ import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.enums.MapFilters
 import elfak.mosis.capturetheflag.utils.extensions.FirebaseLocation
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.gameID
 import java.lang.Exception
 
 import java.util.concurrent.Executors
@@ -94,10 +96,12 @@ class SolveRiddleFragment : Fragment() {
             if (answer.lowercase() == correctAnswerCopy.lowercase()) {
                 if (gameViewModel.riddleType == MapFilters.TeamFlag.value) {
                     gameViewModel.setWinner()
-                    gameViewModel.updateUserRank(1000, userViewModel.selectedUser!!.uid)
+                    val prefs = context?.let { PreferenceHelper.customPreference(it, "User_data") }
+                    prefs?.gameID = ""
+                    userViewModel.updateUserRank(1000, userViewModel.selectedUser!!.uid)
                 }
                 else if (gameViewModel.riddleType == MapFilters.TeamBarriers.value) {
-                    gameViewModel.updateUserRank(500, userViewModel.selectedUser!!.uid)
+                    userViewModel.updateUserRank(500, userViewModel.selectedUser!!.uid)
                     imgID?.let { it1 -> team?.let { it2 ->
                         gameID?.let { it3 ->
                             gameViewModel.deleteRiddleFromDB(it1,
@@ -108,14 +112,14 @@ class SolveRiddleFragment : Fragment() {
                 }
             }
             else {
-                gameViewModel.updateUserRank(-500, userViewModel.selectedUser!!.uid)
+                userViewModel.updateUserRank(-500, userViewModel.selectedUser!!.uid)
             }
 
             findNavController().navigate(R.id.action_SolveRiddleFragment_to_MapFragment)
         }
 
         binding.buttonSolveRiddleCancel.setOnClickListener {
-            gameViewModel.updateUserRank(-500, userViewModel.selectedUser!!.uid)
+            userViewModel.updateUserRank(-500, userViewModel.selectedUser!!.uid)
             findNavController().navigate(R.id.action_SolveRiddleFragment_to_MapFragment)
         }
     }

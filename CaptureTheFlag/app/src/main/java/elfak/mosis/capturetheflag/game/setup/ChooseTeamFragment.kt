@@ -16,7 +16,6 @@ import elfak.mosis.capturetheflag.game.map.MapState
 import elfak.mosis.capturetheflag.game.map.MapViewModel
 import elfak.mosis.capturetheflag.game.map.MapViewModelFactory
 import elfak.mosis.capturetheflag.game.viewmodel.FindGameState
-import elfak.mosis.capturetheflag.game.viewmodel.GameState
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 
