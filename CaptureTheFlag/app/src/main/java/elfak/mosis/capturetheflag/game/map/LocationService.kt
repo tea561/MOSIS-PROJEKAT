@@ -306,7 +306,7 @@ class LocationService : Service(), LocationListener {
         userID?.let { referenceGeoFire.child(it).child("g").setValue(geoHash.geoHashString) }
 
         geoQuery.center = GeoLocation(location.latitude, location.longitude)
-        geoQuery.radius = 0.3
+        geoQuery.radius = 0.01
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

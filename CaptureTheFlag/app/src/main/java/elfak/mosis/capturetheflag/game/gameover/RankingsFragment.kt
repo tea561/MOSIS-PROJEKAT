@@ -20,6 +20,7 @@ import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.data.User
 import elfak.mosis.capturetheflag.game.gameover.placeholder.PlaceholderContent
 import elfak.mosis.capturetheflag.model.FriendsViewModel
+import elfak.mosis.capturetheflag.model.UserViewModel
 
 /**
  * A fragment representing a list of Items.
@@ -28,6 +29,7 @@ class RankingsFragment : Fragment() {
 
     private var columnCount = 1
     private val friendsViewModel: FriendsViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,33 +45,6 @@ class RankingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_rankings_list, container, false)
 
-
-//        // Set the adapter
-//        if (view is RecyclerView) {
-//            with(view) {
-//                layoutManager = when {
-//                    columnCount <= 1 -> LinearLayoutManager(context)
-//                    else -> GridLayoutManager(context, columnCount)
-//                }
-//                val rankingsAdapter = MyRankRecyclerViewAdapter({user -> openFriendProfile(user)}, emptyList())
-//                adapter = rankingsAdapter
-//                friendsViewModel.friends.observe(viewLifecycleOwner){newData ->
-//                    if(newData.size < 1)
-//                    {
-//                        val noFriends: LinearLayout = view.findViewById(R.id.linearLayoutEmptyList)
-//                        noFriends.visibility = View.VISIBLE
-//                    }
-//                    else{
-//                        val noFriends: LinearLayout = view.findViewById(R.id.linearLayoutEmptyList)
-//                        noFriends.visibility = View.GONE
-//
-//                        rankingsAdapter.setData(newData)
-//                        Log.i("Rankings observer", newData.toString())
-//                    }
-//                }
-//
-//            }
-//        }
         return view
     }
 
@@ -88,6 +63,7 @@ class RankingsFragment : Fragment() {
                 noFriends.visibility = View.GONE
                 val rankingsAdapter = MyRankRecyclerViewAdapter({user -> openFriendProfile(user)}, emptyList())
                 recyclerViewRankings.adapter = rankingsAdapter
+                userViewModel.selectedUser?.let { newData.add(it) }
                 rankingsAdapter.setData(newData)
                 Log.i("Rankings observer", newData.toString())
             }

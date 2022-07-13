@@ -180,6 +180,7 @@ class UserViewModel : ViewModel() {
         var rank = _userRank.value
         rank = rank?.plus(increment)
         _userRank.value = rank
+        selectedUser?.rank = rank!!
         dbRef.child("users").child(userID).child("rank").setValue(rank?.toLong())
     }
 
