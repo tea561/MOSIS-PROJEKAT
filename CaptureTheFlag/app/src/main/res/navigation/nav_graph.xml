@@ -184,12 +184,21 @@
         android:name="elfak.mosis.capturetheflag.profile.EditProfileFragment"
         android:label="@string/profile_fragment_label"
         tools:layout="@layout/fragment_edit_profile">
+
+        <action
+            android:id="@+id/action_EditProfileFragment_to_ProfileForUserFragment"
+            app:destination="@id/ProfileForUserFragment" />
+
     </fragment>
 
     <fragment android:id="@+id/ChangePasswordFragment"
         android:name="elfak.mosis.capturetheflag.profile.ChangePasswordFragment"
         android:label="@string/profile_fragment_label"
         tools:layout="@layout/fragment_change_password">
+
+        <action
+            android:id="@+id/action_ChangePasswordFragment_to_ProfileForUserFragment"
+            app:destination="@id/ProfileForUserFragment" />
 
     </fragment>
 

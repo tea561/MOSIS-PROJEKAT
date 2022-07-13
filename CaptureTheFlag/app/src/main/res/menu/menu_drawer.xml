@@ -18,22 +18,11 @@
             />
 
         <item
-            android:id="@+id/notifications"
-            android:icon="@drawable/baseline_notifications_black_24"
-            app:iconTint="@color/blue"
-            android:title="@string/notifications_label"></item>
-
-        <item
             android:id="@+id/RankingsFragment"
             android:icon="@drawable/baseline_emoji_events_24"
             app:iconTint="@color/blue"
             android:title="@string/rankings_label"></item>
 
-        <item
-            android:id="@+id/FriendsFragment"
-            android:icon="@drawable/baseline_people_black_24"
-            app:iconTint="@color/blue"
-            android:title="@string/friends_label"></item>
 
         <item
             android:id="@+id/ProfileForUserFragment"
@@ -44,12 +33,5 @@
 
     </group>
 
-    <group android:menuCategory="secondary">
-        <item
-            android:id="@+id/logout"
-            android:icon="@drawable/baseline_logout_black_24"
-            android:title="@string/log_out"
-            app:iconTint="@color/blue"></item>
-    </group>
 
 </menu>

@@ -33,6 +33,7 @@ import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.isAppActive
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.locationEnabled
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.opposingTeam
+import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper.userId
 
 
 class MainActivity : AppCompatActivity() {
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.ProfileForUserFragment, R.id.HomeFragment, R.id.MapFragment, R.id.FriendsFragment, R.id.RankingsFragment), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.ProfileForUserFragment, R.id.HomeFragment, R.id.MapFragment, R.id.RankingsFragment), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -128,6 +129,13 @@ class MainActivity : AppCompatActivity() {
         prefs.isAppActive = false
     }
 
+    override fun onResume() {
+        super.onResume()
+        val prefs = PreferenceHelper.customPreference(this, "User_data")
+        prefs.isAppActive = true
+
+    }
+
     override fun onDestroy() {
         if (br != null) {
             unregisterReceiver(br);
@@ -137,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceHelper.customPreference(this, "User_data")
         prefs.isAppActive = false
 
-        if (!prefs.locationEnabled) {
+        if (!prefs.locationEnabled || prefs.userId == "") {
             stopService(Intent(this, LocationService().javaClass))
         }
     }

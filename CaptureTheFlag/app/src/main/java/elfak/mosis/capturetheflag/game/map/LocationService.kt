@@ -55,6 +55,9 @@ class LocationService : Service(), LocationListener {
     private val referenceGeoFire = dbRef.child("locationsGeoFire")
 
     private var friendsList = mutableListOf<String>()
+    private var notifiedFriends = mutableListOf<String>()
+    private var notifiedRiddles = mutableListOf<String>()
+    private var notifiedFlag: String = ""
     private lateinit var geoQueryDataListener: GeoQueryDataEventListener
     private lateinit var geoQuery: GeoQuery
     private lateinit var geoFire: GeoFire
@@ -164,41 +167,57 @@ class LocationService : Service(), LocationListener {
         geoQueryDataListener = object: GeoQueryDataEventListener {
             override fun onDataEntered(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
                 val temp = dataSnapshot?.getValue<LocationExtra>()
-                if(temp?.type == "user" && dataSnapshot?.key != null)
+                if(temp?.type == "user" && dataSnapshot.key != null)
                 {
-                    if(friendsList.contains(dataSnapshot?.key))
-                        getFriendByUid(context, dataSnapshot?.key!!)
+                    if(friendsList.contains(dataSnapshot.key)) {
+                        if(!notifiedFriends.contains(dataSnapshot.key)) {
+                            notifiedFriends.add(dataSnapshot.key!!)
+                            getFriendByUid(context, dataSnapshot.key!!)
+                        }
+                    }
                 }
                 else if (prefs.gameID != "") {
                     if (temp?.type == MapFilters.TeamBarriers.value && prefs.opposingTeam == temp?.additionalInfo) {
-                        if (prefs.isAppActive) {
-                            val notificationIntent = Intent("SOME_ACTION")
-                            notificationIntent.putExtra("message", "You have triggered the riddle")
-                            notificationIntent.putExtra("imgID", dataSnapshot?.key)
-                            notificationIntent.putExtra("team", temp?.team)
-                            notificationIntent.putExtra("gameID", prefs.gameID)
-                            sendBroadcast(notificationIntent)
-                        } else {
-                            sendNotification(
-                                context,
-                                "You have triggered the riddle",
-                                R.drawable.ic_burst_solid
-                            )
+                        if (!notifiedRiddles.contains(dataSnapshot.key)) {
+                            notifiedRiddles.add(dataSnapshot.key!!)
+                            if (prefs.isAppActive) {
+                                val notificationIntent = Intent("SOME_ACTION")
+                                notificationIntent.putExtra(
+                                    "message",
+                                    "You have triggered the riddle"
+                                )
+                                notificationIntent.putExtra("imgID", dataSnapshot?.key)
+                                notificationIntent.putExtra("team", temp?.team)
+                                notificationIntent.putExtra("gameID", prefs.gameID)
+                                sendBroadcast(notificationIntent)
+                            } else {
+                                sendNotification(
+                                    context,
+                                    "You have triggered the riddle",
+                                    R.drawable.ic_burst_solid
+                                )
+                            }
                         }
                     } else if (temp?.type == MapFilters.TeamFlag.value && prefs.opposingTeam == temp?.additionalInfo) {
-                        if (prefs.isAppActive) {
-                            val notificationIntent = Intent("SOME_ACTION")
-                            notificationIntent.putExtra("message", "You came across the enemy flag")
-                            notificationIntent.putExtra("imgID", dataSnapshot?.key)
-                            notificationIntent.putExtra("team", temp?.team)
-                            notificationIntent.putExtra("gameID", prefs.gameID)
-                            sendBroadcast(notificationIntent)
-                        } else {
-                            sendNotification(
-                                context,
-                                "You came across the enemy flag",
-                                R.drawable.ic_flag_solid
-                            )
+                        if (notifiedFlag == "") {
+                            notifiedFlag = dataSnapshot.key!!
+                            if (prefs.isAppActive) {
+                                val notificationIntent = Intent("SOME_ACTION")
+                                notificationIntent.putExtra(
+                                    "message",
+                                    "You came across the enemy flag"
+                                )
+                                notificationIntent.putExtra("imgID", dataSnapshot?.key)
+                                notificationIntent.putExtra("team", temp?.team)
+                                notificationIntent.putExtra("gameID", prefs.gameID)
+                                sendBroadcast(notificationIntent)
+                            } else {
+                                sendNotification(
+                                    context,
+                                    "You came across the enemy flag",
+                                    R.drawable.ic_flag_solid
+                                )
+                            }
                         }
                     }
                 }
@@ -206,7 +225,26 @@ class LocationService : Service(), LocationListener {
             }
 
             override fun onDataExited(dataSnapshot: DataSnapshot?) {
-                Log.i("GEOFIRE", "exited ${dataSnapshot?.key}")
+                val temp = dataSnapshot?.getValue<LocationExtra>()
+                if(temp?.type == "user" && dataSnapshot.key != null)
+                {
+                    if(friendsList.contains(dataSnapshot.key)) {
+                        if(notifiedFriends.contains(dataSnapshot.key)) {
+                            notifiedFriends.remove(dataSnapshot.key!!)
+                        }
+                    }
+                }
+                else if (prefs.gameID != "") {
+                    if (temp?.type == MapFilters.TeamBarriers.value && prefs.opposingTeam == temp?.additionalInfo) {
+                        if (notifiedRiddles.contains(dataSnapshot.key)) {
+                            notifiedRiddles.remove(dataSnapshot.key!!)
+                        }
+                    } else if (temp?.type == MapFilters.TeamFlag.value && prefs.opposingTeam == temp?.additionalInfo) {
+                        if (notifiedFlag != "") {
+                            notifiedFlag = ""
+                        }
+                    }
+                }
             }
 
             override fun onDataMoved(dataSnapshot: DataSnapshot?, location: GeoLocation?) {
@@ -232,14 +270,6 @@ class LocationService : Service(), LocationListener {
         userID?.let { referenceGeoFire.child(it).child("type").setValue("user") }
         userID?.let { referenceGeoFire.child(it).child("additionalInfo").setValue("") }
         userID?.let { referenceGeoFire.child(it).child("team").setValue("") }
-
-//        referenceGeoFire.child("keyZaRiddle").child("type").setValue("riddle")
-//        val geoHash: GeoHash = GeoHash(43.31585166666667,
-//            21.91415833333333)
-//
-//        referenceGeoFire.child("keyZaRiddle").child("l").setValue(arrayListOf(43.31585166666667,
-//            21.91415833333333))
-//        referenceGeoFire.child("keyZaRiddle").child("g").setValue(geoHash.geoHashString)
 
         geoQuery = geoFire.queryAtLocation(GeoLocation(0.0, 0.0), 0.0)
         geoQuery.addGeoQueryDataEventListener(geoQueryDataListener)

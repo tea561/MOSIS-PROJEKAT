@@ -314,18 +314,22 @@ class GameViewModel : ViewModel() {
 
     fun subscribeToWinnerInDB(){
         if (!isSubscribedToWinner) {
-            isSubscribedToWinner = true
-            dbRef.child("games").child(gameUid).child("winner").addValueEventListener(object: ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val temp = snapshot.getValue(String::class.java)
-                    _winner.value = temp
-                }
+            if (gameUid != "") {
+                isSubscribedToWinner = true
+                dbRef.child("games").child(gameUid).child("winner").addValueEventListener(object: ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val temp = snapshot.getValue(String::class.java)
+                        if (temp != null) {
+                            _winner.value = temp
+                        }
+                    }
 
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onCancelled(error: DatabaseError) {
+                        //TODO("Not yet implemented")
+                    }
 
-            })
+                })
+            }
         }
     }
 

@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/ic_bckg7"
+    android:gravity="center"
     tools:context=".game.setup.JoinGameFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputGameCode"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        android:layout_width="371dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
-        android:hint="Game Code">
+        android:hint="Game Code"
+        android:textColorHint="@color/white"
+        app:boxStrokeColor="@color/white"
+        app:hintTextColor="@color/white"
+        app:placeholderTextColor="@color/white">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/gameCode"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
 
         <Button
             android:id="@+id/buttonJoinGame"
@@ -26,9 +34,11 @@
             android:layout_marginStart="28dp"
             android:layout_marginEnd="28dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/green"
+            android:backgroundTint="@color/yellow"
             android:text="@string/join_game"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 

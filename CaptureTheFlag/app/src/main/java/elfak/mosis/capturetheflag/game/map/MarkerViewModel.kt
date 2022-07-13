@@ -153,30 +153,28 @@ class MarkerViewModel : ViewModel() {
 
     private fun onChildRemovedGameObject(dataSnapshot: DataSnapshot) {
         val key = dataSnapshot.key
-        val gameObject = dataSnapshot.value as MapObject
 
-        when (gameObject.type) {
-            MapFilters.TeamBarriers.value -> {
-                val teamBarriersList = _teamBarriers.value
-                teamBarriersList!!.remove(key)
-                _teamBarriers.value = teamBarriersList
-            }
-            MapFilters.EnemyBarriers.value -> {
-                val enemyBarriersList = _enemyBarriers.value
-                enemyBarriersList!!.remove(key)
-                _enemyBarriers.value = enemyBarriersList
-            }
-            MapFilters.TeamFlag.value -> {
-                _teamFlag.value = null
-            }
-            MapFilters.EnemyFlag.value -> {
-                _enemyFlag.value = null
-            }
-            else -> {
-                // ovo ne bi trebalo da se desi
-                Log.d("MARKERS", "Unknown map object type: ${gameObject.type}")
-            }
+        if (_teamBarriers.value!!.containsKey(key)) {
+            val teamBarriersList = _teamBarriers.value
+            teamBarriersList!!.remove(key)
+            _teamBarriers.value = teamBarriersList
         }
+        else if (_enemyBarriers.value!!.containsKey(key)) {
+            val enemyBarriersList = _enemyBarriers.value
+            enemyBarriersList!!.remove(key)
+            _enemyBarriers.value = enemyBarriersList
+        }
+        else if (_teamFlag.value != null && _teamFlag.value!!.uid == key) {
+            _teamFlag.value = MapObject()
+        }
+        else if (_enemyFlag.value != null && _enemyFlag.value!!.uid == key) {
+            _enemyFlag.value = MapObject()
+        }
+        else {
+                // ovo ne bi trebalo da se desi
+                Log.d("MARKERS", "Unknown map object with key: $key")
+        }
+
     }
 
     private fun getFriendFromDB(key: String) {

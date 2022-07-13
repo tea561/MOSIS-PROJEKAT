@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthCredential
@@ -111,6 +112,10 @@ class ChangePasswordFragment : Fragment() {
 
                 }
             }
+        }
+
+        binding.buttonCancel.setOnClickListener {
+            findNavController().navigate(R.id.action_ChangePasswordFragment_to_ProfileForUserFragment)
         }
     }
 }

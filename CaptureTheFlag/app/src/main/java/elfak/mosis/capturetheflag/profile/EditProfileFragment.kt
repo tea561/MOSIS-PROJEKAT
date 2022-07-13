@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentEditProfileBinding
 import elfak.mosis.capturetheflag.databinding.FragmentIntro3Binding
@@ -94,6 +95,10 @@ class EditProfileFragment : Fragment() {
             }
 
             Toast.makeText(view.context, "User updated!", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.buttonCancel.setOnClickListener{
+            findNavController().navigate(R.id.action_EditProfileFragment_to_ProfileForUserFragment)
         }
     }
 

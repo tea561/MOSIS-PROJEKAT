@@ -142,19 +142,24 @@ class MapFragment : Fragment() {
         map = requireView().findViewById(R.id.map)
 
         if (ActivityCompat.checkSelfPermission(
-                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_DENIED
-            && ActivityCompat.checkSelfPermission(
                 requireActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (ActivityCompat.checkSelfPermission(
                 requireActivity(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
         else {
             setMyLocationOverlay()
         }
+
         map.setMultiTouchControls(true)
         map.controller.setZoom(20.0)
         val mapEventsOverlay = MapEventsOverlay(mapViewModel)
@@ -327,8 +332,9 @@ class MapFragment : Fragment() {
                 fabFilters.hide()
             }
             is MapState.BeginGame -> {
-                prefs.opposingTeam = gameViewModel.opposingTeamName
-                markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
+                if (gameViewModel.team != "") {
+                    prefs.opposingTeam = gameViewModel.opposingTeamName
+                    markerViewModel.getGameObjects(gameViewModel.gameUid, gameViewModel.team)
                     if (gameViewModel.teams[gameViewModel.team]!!.memberCount > 0) {
                         val dialog = WaitForFlagDialog()
                         dialog.show(activity!!.supportFragmentManager, "WaitForFlagDialog")
@@ -338,6 +344,7 @@ class MapFragment : Fragment() {
                         gameViewModel.teams[gameViewModel.team]!!.memberCount++
                         dialog.show(activity!!.supportFragmentManager, "PlaceFlagDialog")
                     }
+                }
             }
 
             is MapState.PlacingFlag -> {
@@ -538,14 +545,14 @@ class MapFragment : Fragment() {
         if(state != "" && state == gameViewModel.team){
             mapViewModel.setMapState(MapState.Idle)
             gameViewModel.resetGame()
-            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM WON"))
+            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM WON", "userID" to userViewModel.selectedUser?.uid))
             findNavController().navigate(R.id.action_MapFragment_to_GameOverFragment)
 
         }
         else if (state != "") {
             mapViewModel.setMapState(MapState.Idle)
             gameViewModel.resetGame()
-            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM LOST"))
+            setFragmentResult("requestTitle", bundleOf("bundleTitle" to "YOUR TEAM LOST", "userID" to userViewModel.selectedUser?.uid))
             findNavController().navigate(R.id.action_MapFragment_to_GameOverFragment)
         }
     }
@@ -629,7 +636,7 @@ class MapFragment : Fragment() {
         }
         teamFlagMarker = null
 
-        if (state != null) {
+        if (state.uid != "") {
             val marker = Marker(map)
             marker.position = GeoPoint(state.latitude, state.longitude)
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
@@ -647,7 +654,7 @@ class MapFragment : Fragment() {
         }
         enemyFlagMarker = null
 
-        if (state != null) {
+        if (state.uid != "") {
             val marker = Marker(map)
             marker.position = GeoPoint(state.latitude, state.longitude)
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)

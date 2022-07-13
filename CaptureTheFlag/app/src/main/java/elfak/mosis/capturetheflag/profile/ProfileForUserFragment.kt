@@ -1,5 +1,6 @@
 package elfak.mosis.capturetheflag.profile
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -19,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import elfak.mosis.capturetheflag.R
 import elfak.mosis.capturetheflag.databinding.FragmentProfileForUserBinding
+import elfak.mosis.capturetheflag.game.map.LocationService
 import elfak.mosis.capturetheflag.game.viewmodel.GameViewModel
 import elfak.mosis.capturetheflag.model.UserViewModel
 import elfak.mosis.capturetheflag.utils.helpers.PreferenceHelper
@@ -101,6 +103,7 @@ class ProfileForUserFragment : Fragment() {
             prefs?.gameID = ""
             userViewModel.logoutUser()
             gameViewModel.resetGame()
+            requireActivity().stopService(Intent(context, LocationService().javaClass))
             findNavController().navigate(R.id.action_ProfileForUserFragment_to_LoginFragment)
         }
     }

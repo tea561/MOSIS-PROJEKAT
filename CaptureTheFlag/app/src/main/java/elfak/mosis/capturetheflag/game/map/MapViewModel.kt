@@ -120,7 +120,7 @@ class MapViewModel(app: Application, var uid: String) : ViewModel(), MapEventsRe
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                //TODO("Not yet implemented")
             }
 
         })

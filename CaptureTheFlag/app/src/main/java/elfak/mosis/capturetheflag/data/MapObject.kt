@@ -11,9 +11,9 @@ data class MapObject(
     val longitude: Double = 0.0,
     val type: String = "",
     val timestamp: Long = System.currentTimeMillis(),
-    val riddleImgUrl: String,
-    val riddleAnswer: String,
-    val team: String) {
+    val riddleImgUrl: String = "",
+    val riddleAnswer: String = "",
+    val team: String = "") {
 
 
 
