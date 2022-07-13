@@ -10,7 +10,6 @@
         android:id="@+id/buttonSkip2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp"
         android:background="#00FFFFFF"
         android:text="@string/skip"
@@ -23,14 +22,13 @@
         app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewIntro2Desc"
-        app:layout_constraintVertical_bias="1.0"
         tools:text="@string/skip" />
 
     <TextView
         android:id="@+id/textViewIntro2Desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="132dp"
         android:text="@string/intro2_desc"
         android:textSize="16sp"
@@ -59,7 +57,7 @@
     <ImageView
         android:id="@+id/imageViewIntro2"
         android:layout_width="413dp"
-        android:layout_height="413dp"
+        android:layout_height="400dp"
         android:src="@drawable/intro2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,7 +69,7 @@
         android:id="@+id/buttonTakeAPhoto"
         android:layout_width="234dp"
         android:layout_height="48dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="24dp"
         android:backgroundTint="@color/orange"
         android:text="@string/take_a_photo"

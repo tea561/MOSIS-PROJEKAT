@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/imageViewIntro4"
         android:layout_width="wrap_content"
-        android:layout_height="457dp"
+        android:layout_height="400dp"
         android:src="@drawable/intro4" />
 
     <TextView
@@ -26,7 +26,7 @@
     <TextView
         android:id="@+id/textViewIntroDesc4"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="45dp"
         android:layout_marginTop="16dp"
         android:text="@string/intro4_desc"
         android:textAlignment="center"
@@ -34,9 +34,9 @@
 
     <Button
         android:id="@+id/buttonGetStarted"
-        android:layout_width="234dp"
+        android:layout_width="185dp"
         android:layout_height="48dp"
-        android:layout_marginLeft="92dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="32dp"
         android:backgroundTint="@color/yellow"
         android:text="@string/get_started"

@@ -28,7 +28,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="welcome">Welcome To Capture The Flag</string>
-    <string name="welcome_desc">Bla bla bla dobrodosli da</string>
+    <string name="welcome_desc">Let us guide you through setting up your profile.</string>
     <string name="skip">Skip</string>
     <string name="intro2">First, set your profile picture</string>
     <string name="intro2_desc">It will be easier for your friends to find you.</string>
